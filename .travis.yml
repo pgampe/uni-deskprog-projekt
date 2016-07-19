@@ -2,7 +2,6 @@ sudo: false
 language: node_js
 cache:
   directories:
-    - tests/elm-stuff
     - example/elm-stuff
 node_js:
   - "4.3"
