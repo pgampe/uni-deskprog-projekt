@@ -15,22 +15,34 @@ import Svg.Attributes exposing (..)
 import List exposing (..)
 
 type Msg
-    = Enlarge
-    | Reset
-    | Tick Time
-    | Shrink
+    =
+    --Enlarge
+    Reset
+    --| Tick Time
+    --| Shrink
     | Click Position
     | Jump
-    | Resize Float
+    --| Resize Float
+
+
+
+type alias Piece =
+    {id : Int, active : Bool}
+
+type alias Player =
+    {offset : Int, pieces : List Piece}
+
+type alias PiecePosition =
+    {id : Int, x : Int, y : Int, fill : String,  xlinkHref : String}
 
 
 type alias Model =
-    { radius : Float, isRed : Bool, clicked : Maybe Position }
+    { clicked : Maybe Position,  players : List Player, next : Player}
 
 
 init : (Model, Cmd Msg)
 init =
-    ( { radius = 25, isRed = True, clicked = Nothing }, Cmd.none )
+    ( { clicked = Nothing, players = [{offset = 0, pieces = []}], next = {offset = 0, pieces = []} }, Cmd.none )
 
 
 main =
@@ -43,47 +55,43 @@ main =
 
 -- https://de.wikipedia.org/wiki/Datei:Dontworry.svg
 view : Model -> Svg Msg
-view { radius, isRed, clicked } =
+view (model) =
     Svg.svg [width "1500", height "1500"]
       (concat [svgbasics, svgdefs, svgoutersquares, svglines, svgarrows, svgletters, svgpositions])
 
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
-update msg ({ radius, isRed } as model) =
+--update msg ({ radius, isRed } as model) =
+update msg (model) =
     case msg of
-        Enlarge ->
-            ( { model | radius = radius + 2 }, Cmd.none )
-
-        Shrink ->
-            ( { model | radius = radius - 1 }, Cmd.none )
 
         Reset ->
             init
-
-        Tick _ ->
-            ( { model | isRed = not isRed }, Cmd.none )
 
         Click pos ->
             ( { model | clicked = Just pos }, Cmd.none )
 
         Jump ->
-            ( model, Random.generate Resize (Random.float 0 50) )
+            --( model, Random.generate Resize (Random.float 0 50) )
+            ( model, Cmd.none )
 
-        Resize newRadius ->
-            ( { model | radius = newRadius }, Cmd.none )
+        --Resize newRadius ->
+            --( { model | radius = newRadius }, Cmd.none )
 
 
-subscriptions { radius } =
-    if radius > 20 then
-        Sub.batch
-            [ Time.every second Tick
-            , Mouse.clicks (\_ -> Shrink)
-            ]
-    else if radius > 0 then
-        Mouse.clicks (\_ -> Shrink)
-    else
-        Sub.none
+subscriptions (model) = Sub.none
+--subscriptions { radius } = Sub.none
+    --Mouse.clicks (\_ -> Shrink)
+    --if radius > 20 then
+    --    Sub.batch
+     --       [ Time.every second Tick
+    --        , Mouse.clicks (\_ -> Shrink)
+     --       ]
+    --else if radius > 0 then
+     --   Mouse.clicks (\_ -> Shrink)
+    --else
+     --   Sub.none
 
 
 offsetPosition : Decoder Position
