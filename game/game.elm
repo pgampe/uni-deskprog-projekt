@@ -27,6 +27,7 @@ type alias Model =
     { radius : Float, isRed : Bool, clicked : Maybe Position }
 
 
+init : (Model, Cmd Msg)
 init =
     ( { radius = 25, isRed = True, clicked = Nothing }, Cmd.none )
 
@@ -40,6 +41,7 @@ main =
         }
 
 
+view : Model -> Html Msg
 view { radius, isRed, clicked } =
     div []
         [ h1 [] [ Html.text "Überschrift" ]
@@ -69,6 +71,7 @@ view { radius, isRed, clicked } =
         ]
 
 
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg ({ radius, isRed } as model) =
     case msg of
         Enlarge ->
