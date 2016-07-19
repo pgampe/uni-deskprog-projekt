@@ -5,13 +5,13 @@ import Html.Events exposing (..)
 import Html.App exposing (program)
 import Markdown
 import Element
-import Collage exposing (..)
 import Color exposing (..)
 import Time exposing (Time, second)
 import Mouse exposing (Position)
 import Json.Decode exposing (Decoder, (:=))
 import Random
-
+import Svg exposing (..)
+import Svg.Attributes exposing (..)
 
 type Msg
     = Enlarge
@@ -41,34 +41,13 @@ main =
         }
 
 
-view : Model -> Html Msg
+view : Model -> Svg Msg
 view { radius, isRed, clicked } =
-    div []
-        [ h1 [] [ Html.text "Überschrift" ]
-        , ol []
-            [ li [] [ Html.text "Erstens" ]
-            , li [] [ Html.text "Zweitens" ]
-            , li [] [ Html.text "Drittens" ]
-            ]
-        , Markdown.toHtml [] "[link](https://github.com)"
-        , Html.text (toString clicked)
-        , div [ on "click" (Json.Decode.map Click offsetPosition) ]
-            [ Element.toHtml
-                <| collage 100
-                    100
-                    [ filled
-                        (if isRed then
-                            red
-                         else
-                            blue
-                        )
-                        (circle radius)
-                    ]
-            ]
-        , button [ onClick Enlarge ] [ Html.text "Vergrößern" ]
-        , button [ onClick Reset ] [ Html.text "Zurücksetzen" ]
-        , button [ onClick Jump ] [ Html.text "Zufällig" ]
-        ]
+    Svg.svg [width "100", height "100"]
+      [ circle [cx "50", cy "50", r "40", stroke "green", strokeWidth "4", fill "yellow"] []
+      , circle [cx "30", cy "30", r (toString radius), stroke "red", strokeWidth "4", fill "blue", onClick Enlarge] []
+      ]
+
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
