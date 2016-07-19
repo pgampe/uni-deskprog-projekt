@@ -10,5 +10,5 @@ install:
 before_script:
   - bash example/setup.sh
 script:
-  - ls
+  - ls example
 #  - node tests/test.js
