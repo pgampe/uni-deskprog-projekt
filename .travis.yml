@@ -7,7 +7,7 @@ cache:
 node_js:
   - "4.3"
 install:
-  - npm install -g elm@0.16.0
+  - npm install -g elm@0.17.0
 before_script:
   - bash example/setup.sh
 script:
