@@ -57,7 +57,7 @@ main =
 view : Model -> Svg Msg
 view (model) =
     Svg.svg [width "1500", height "1500"]
-      (concat [svgbasics, svgdefs, svgoutersquares, svglines, svgarrows, svgletters, svgpositions])
+      (concat [svgbasics, svgdefs, svgoutersquares, svglines, svgarrows, svgletters, (positionsToSvg availablePositions)])
 
 
 
@@ -244,102 +244,107 @@ svgletters =
     , use [xlinkHref "#bb", transform "translate(563,-563)"] []
     ]
 
-svgpositions =
+positionsToSvg piecepositions = map positionToSvg piecepositions
+
+positionToSvg p = use [x (toString p.x), y (toString p.y), xlinkHref p.xlinkHref, fill p.fill] []
+
+availablePositions : List PiecePosition
+availablePositions =
     [
-    use [x "875", y "125", xlinkHref "#cg", fill "green"] []
-    , use [x "875", y "250", xlinkHref "#cw", fill "white"] []
-    , use [x "875", y "375", xlinkHref "#cw", fill "white"] []
-    , use [x "875", y "500", xlinkHref "#cw", fill "white"] []
-    , use [x "875", y "625", xlinkHref "#cw", fill "white"] []
+     {id =  1, x = 875, y = 125, xlinkHref = "#cg", fill = "green"}
+    , {id =  2, x = 875, y = 250, xlinkHref = "#cw", fill = "white"}
+    , {id =  3, x = 875, y = 375, xlinkHref = "#cw", fill = "white"}
+    , {id =  4, x = 875, y = 500, xlinkHref = "#cw", fill = "white"}
+    , {id =  5, x = 875, y = 625, xlinkHref = "#cw", fill = "white"}
 
-    , use [x "1000", y "625", xlinkHref "#cw", fill "white"] []
-    , use [x "1125", y "625", xlinkHref "#cw", fill "white"] []
-    , use [x "1250", y "625", xlinkHref "#cw", fill "white"] []
-    , use [x "1375", y "625", xlinkHref "#cw", fill "white"] []
+    , {id =  6, x = 1000, y = 625, xlinkHref = "#cw", fill = "white"}
+    , {id =  7, x = 1125, y = 625, xlinkHref = "#cw", fill = "white"}
+    , {id =  8, x = 1250, y = 625, xlinkHref = "#cw", fill = "white"}
+    , {id =  9, x = 1375, y = 625, xlinkHref = "#cw", fill = "white"}
 
-    , use [x "1375", y "750", xlinkHref "#cw", fill "white"] []
-    , use [x "1375", y "875", xlinkHref "#cr", fill "red"] []
+    , {id = 10, x = 1375, y = 750, xlinkHref = "#cw", fill = "white"}
+    , {id = 11, x = 1375, y = 875, xlinkHref = "#cr", fill = "red"}
 
-    , use [x "875", y "875", xlinkHref "#cw", fill "white"] []
-    , use [x "1250", y "875", xlinkHref "#cw", fill "white"] []
-    , use [x "1125", y "875", xlinkHref "#cw", fill "white"] []
-    , use [x "1000", y "875", xlinkHref "#cw", fill "white"] []
+    , {id = 12, x = 875, y = 875, xlinkHref = "#cw", fill = "white"}
+    , {id = 13, x = 1250, y = 875, xlinkHref = "#cw", fill = "white"}
+    , {id = 14, x = 1125, y = 875, xlinkHref = "#cw", fill = "white"}
+    , {id = 15, x = 1000, y = 875, xlinkHref = "#cw", fill = "white"}
 
-    , use [x "875", y "1000", xlinkHref "#cw", fill "white"] []
-    , use [x "875", y "1125", xlinkHref "#cw", fill "white"] []
-    , use [x "875", y "1250", xlinkHref "#cw", fill "white"] []
-    , use [x "875", y "1375", xlinkHref "#cw", fill "white"] []
-
-
-    , use [x "750", y "1375", xlinkHref "#cw", fill "white"] []
-    , use [x "625", y "1375", xlinkHref "#cb", fill "black"] []
-
-    , use [x "625", y "1250", xlinkHref "#cw", fill "white"] []
-    , use [x "625", y "1125", xlinkHref "#cw", fill "white"] []
-    , use [x "625", y "1000", xlinkHref "#cw", fill "white"] []
-    , use [x "625", y "875", xlinkHref "#cw", fill "white"] []
-
-    , use [x "500", y "875", xlinkHref "#cw", fill "white"] []
-    , use [x "375", y "875", xlinkHref "#cw", fill "white"] []
-    , use [x "250", y "875", xlinkHref "#cw", fill "white"] []
-    , use [x "125", y "875", xlinkHref "#cw", fill "white"] []
-
-    , use [x "125", y "750", xlinkHref "#cw", fill "white"] []
-    , use [x "125", y "625", xlinkHref "#cy", fill "yellow"] []
-
-    , use [x "250", y "625", xlinkHref "#cw", fill "white"] []
-    , use [x "375", y "625", xlinkHref "#cw", fill "white"] []
-    , use [x "500", y "625", xlinkHref "#cw", fill "white"] []
-    , use [x "625", y "625", xlinkHref "#cw", fill "white"] []
-
-    , use [x "625", y "500", xlinkHref "#cw", fill "white"] []
-    , use [x "625", y "375", xlinkHref "#cw", fill "white"] []
-    , use [x "625", y "250", xlinkHref "#cw", fill "white"] []
-    , use [x "625", y "125", xlinkHref "#cw", fill "white"] []
-
-    , use [x "750", y "125", xlinkHref "#cw", fill "white"] []
+    , {id = 16, x = 875, y = 1000, xlinkHref = "#cw", fill = "white"}
+    , {id = 17, x = 875, y = 1125, xlinkHref = "#cw", fill = "white"}
+    , {id = 18, x = 875, y = 1250, xlinkHref = "#cw", fill = "white"}
+    , {id = 19, x = 875, y = 1375, xlinkHref = "#cw", fill = "white"}
 
 
+    , {id = 20, x = 750, y = 1375, xlinkHref = "#cw", fill = "white"}
+    , {id = 21, x = 625, y = 1375, xlinkHref = "#cb", fill = "black"}
 
-    , use [x "750", y "250", xlinkHref "#csg", fill "green"] []
-    , use [x "750", y "375", xlinkHref "#csg", fill "green"] []
-    , use [x "750", y "500", xlinkHref "#csg", fill "green"] []
-    , use [x "750", y "625", xlinkHref "#csg", fill "green"] []
+    , {id = 22, x = 625, y = 1250, xlinkHref = "#cw", fill = "white"}
+    , {id = 23, x = 625, y = 1125, xlinkHref = "#cw", fill = "white"}
+    , {id = 24, x = 625, y = 1000, xlinkHref = "#cw", fill = "white"}
+    , {id = 25, x = 625, y = 875, xlinkHref = "#cw", fill = "white"}
 
-    , use [x "750", y "875", xlinkHref "#csb", fill "black"] []
-    , use [x "750", y "1000", xlinkHref "#csb", fill "black"] []
-    , use [x "750", y "1125", xlinkHref "#csb", fill "black"] []
-    , use [x "750", y "1250", xlinkHref "#csb", fill "black"] []
+    , {id = 26, x = 500, y = 875, xlinkHref = "#cw", fill = "white"}
+    , {id = 27, x = 375, y = 875, xlinkHref = "#cw", fill = "white"}
+    , {id = 28, x = 250, y = 875, xlinkHref = "#cw", fill = "white"}
+    , {id = 29, x = 125, y = 875, xlinkHref = "#cw", fill = "white"}
 
-    , use [x "250", y "750", xlinkHref "#csy", fill "yellow"] []
-    , use [x "375", y "750", xlinkHref "#csy", fill "yellow"] []
-    , use [x "500", y "750", xlinkHref "#csy", fill "yellow"] []
-    , use [x "625", y "750", xlinkHref "#csy", fill "yellow"] []
+    , {id = 30, x = 125, y = 750, xlinkHref = "#cw", fill = "white"}
+    , {id = 31, x = 125, y = 625, xlinkHref = "#cy", fill = "yellow"}
 
-    , use [x "875", y "750", xlinkHref "#csr", fill "red"] []
-    , use [x "1000", y "750", xlinkHref "#csr", fill "red"] []
-    , use [x "1125", y "750", xlinkHref "#csr", fill "red"] []
-    , use [x "1250", y "750", xlinkHref "#csr", fill "red"] []
+    , {id = 32, x = 250, y = 625, xlinkHref = "#cw", fill = "white"}
+    , {id = 33, x = 375, y = 625, xlinkHref = "#cw", fill = "white"}
+    , {id = 34, x = 500, y = 625, xlinkHref = "#cw", fill = "white"}
+    , {id = 35, x = 625, y = 625, xlinkHref = "#cw", fill = "white"}
+
+    , {id = 36, x = 625, y = 500, xlinkHref = "#cw", fill = "white"}
+    , {id = 37, x = 625, y = 375, xlinkHref = "#cw", fill = "white"}
+    , {id = 38, x = 625, y = 250, xlinkHref = "#cw", fill = "white"}
+    , {id = 39, x = 625, y = 125, xlinkHref = "#cw", fill = "white"}
+
+    , {id = 40, x = 750, y = 125, xlinkHref = "#cw", fill = "white"}
 
 
 
-    , use [x "1250", y "125", xlinkHref "#csg", fill "green"] []
-    , use [x "1375", y "125", xlinkHref "#csg", fill "green"] []
-    , use [x "1250", y "250", xlinkHref "#csg", fill "green"] []
-    , use [x "1375", y "250", xlinkHref "#csg", fill "green"] []
+    , {id = 41, x = 750, y = 250, xlinkHref = "#csg", fill = "green"}
+    , {id = 42, x = 750, y = 375, xlinkHref = "#csg", fill = "green"}
+    , {id = 43, x = 750, y = 500, xlinkHref = "#csg", fill = "green"}
+    , {id = 44, x = 750, y = 625, xlinkHref = "#csg", fill = "green"}
 
-    , use [x "125", y "1250", xlinkHref "#csb", fill "black"] []
-    , use [x "250", y "1250", xlinkHref "#csb", fill "black"] []
-    , use [x "125", y "1375", xlinkHref "#csb", fill "black"] []
-    , use [x "250", y "1375", xlinkHref "#csb", fill "black"] []
+    , {id = 51, x = 875, y = 750, xlinkHref = "#csr", fill = "red"}
+    , {id = 52, x = 1000, y = 750, xlinkHref = "#csr", fill = "red"}
+    , {id = 53, x = 1125, y = 750, xlinkHref = "#csr", fill = "red"}
+    , {id = 54, x = 1250, y = 750, xlinkHref = "#csr", fill = "red"}
 
-    , use [x "125", y "125", xlinkHref "#csy", fill "yellow"] []
-    , use [x "250", y "125", xlinkHref "#csy", fill "yellow"] []
-    , use [x "125", y "250", xlinkHref "#csy", fill "yellow"] []
-    , use [x "250", y "250", xlinkHref "#csy", fill "yellow"] []
+    , {id = 61, x = 750, y = 875, xlinkHref = "#csb", fill = "black"}
+    , {id = 62, x = 750, y = 1000, xlinkHref = "#csb", fill = "black"}
+    , {id = 63, x = 750, y = 1125, xlinkHref = "#csb", fill = "black"}
+    , {id = 64, x = 750, y = 1250, xlinkHref = "#csb", fill = "black"}
 
-    , use [x "1250", y "1250", xlinkHref "#csr", fill "red"] []
-    , use [x "1375", y "1250", xlinkHref "#csr", fill "red"] []
-    , use [x "1250", y "1375", xlinkHref "#csr", fill "red"] []
-    , use [x "1375", y "1375", xlinkHref "#csr", fill "red"] []
+    , {id = 71, x = 250, y = 750, xlinkHref = "#csy", fill = "yellow"}
+    , {id = 72, x = 375, y = 750, xlinkHref = "#csy", fill = "yellow"}
+    , {id = 73, x = 500, y = 750, xlinkHref = "#csy", fill = "yellow"}
+    , {id = 74, x = 625, y = 750, xlinkHref = "#csy", fill = "yellow"}
+
+
+
+    , {id = 101, x = 1250, y = 125, xlinkHref = "#csg", fill = "green"}
+    , {id = 102, x = 1375, y = 125, xlinkHref = "#csg", fill = "green"}
+    , {id = 103, x = 1250, y = 250, xlinkHref = "#csg", fill = "green"}
+    , {id = 104, x = 1375, y = 250, xlinkHref = "#csg", fill = "green"}
+
+    , {id = 111, x = 125, y = 1250, xlinkHref = "#csb", fill = "black"}
+    , {id = 112, x = 250, y = 1250, xlinkHref = "#csb", fill = "black"}
+    , {id = 113, x = 125, y = 1375, xlinkHref = "#csb", fill = "black"}
+    , {id = 114, x = 250, y = 1375, xlinkHref = "#csb", fill = "black"}
+
+    , {id = 121, x = 125, y = 125, xlinkHref = "#csy", fill = "yellow"}
+    , {id = 122, x = 250, y = 125, xlinkHref = "#csy", fill = "yellow"}
+    , {id = 123, x = 125, y = 250, xlinkHref = "#csy", fill = "yellow"}
+    , {id = 124, x = 250, y = 250, xlinkHref = "#csy", fill = "yellow"}
+
+    , {id = 131, x = 1250, y = 1250, xlinkHref = "#csr", fill = "red"}
+    , {id = 132, x = 1375, y = 1250, xlinkHref = "#csr", fill = "red"}
+    , {id = 133, x = 1250, y = 1375, xlinkHref = "#csr", fill = "red"}
+    , {id = 134, x = 1375, y = 1375, xlinkHref = "#csr", fill = "red"}
     ]
