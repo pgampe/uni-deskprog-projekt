@@ -3,12 +3,15 @@ language: node_js
 cache:
   directories:
     - example/elm-stuff
+    - game/elm-stuff
 node_js:
   - "4.3"
 install:
   - npm install -g elm@0.17.0
 before_script:
   - bash example/setup.sh
+  - bash game/setup.sh
 script:
-  - ls example
+  - cd game
+  - elm make --yes --output game.html game.elm
 #  - node tests/test.js
