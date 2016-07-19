@@ -10,5 +10,6 @@ install:
   - npm install -g elm@0.16.0
 before_script:
   - bash example/setup.sh
-#script:
+script:
+  - ls
 #  - node tests/test.js
