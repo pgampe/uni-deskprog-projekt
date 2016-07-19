@@ -3,13 +3,7 @@
 cd "$(dirname "$0")"
 set -e
 
-echo "before"
-find .
-
 elm-package install -y
-
-echo "after"
-find .
 
 #ELM_CONSOLE_VERSION_DIR="$(ls elm-stuff/packages/laszlopandy/elm-console/)"
 #ELM_IO_PATH="elm-stuff/packages/laszlopandy/elm-console/$ELM_CONSOLE_VERSION_DIR/elm-io.sh"
