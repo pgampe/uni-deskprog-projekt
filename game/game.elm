@@ -4,7 +4,6 @@ import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Svg.Events exposing (..)
 import Html.App as App
-import Markdown
 import Json.Decode exposing (Decoder, (:=))
 import Random
 import List exposing (..)
