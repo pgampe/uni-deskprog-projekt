@@ -5,10 +5,6 @@ import Svg.Attributes exposing (..)
 import Svg.Events exposing (..)
 import Html.App as App
 import Markdown
-import Element
-import Color exposing (..)
-import Time exposing (Time, second)
-import Mouse exposing (Position)
 import Json.Decode exposing (Decoder, (:=))
 import Random
 import List exposing (..)
@@ -31,12 +27,12 @@ type alias PiecePosition =
 
 
 type alias Model =
-    { clicked : Maybe Position, players : List Player, next : Player, dice : Dice.Model }
+    { players : List Player, next : Player, dice : Dice.Model }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( { clicked = Nothing, players = [ { offset = 0, pieces = [] } ], next = { offset = 0, pieces = [] }, dice = Dice.init }, Cmd.none )
+    ( { players = [ { offset = 0, pieces = [] } ], next = { offset = 0, pieces = [] }, dice = Dice.init }, Cmd.none )
 
 
 main =
@@ -53,7 +49,6 @@ type Msg
       Reset
       --| Tick Time
       --| Shrink
-    | Click Position
     | Jump
     | RollDice
     | SetDice Int
@@ -87,9 +82,6 @@ update msg model =
         Reset ->
             init
 
-        Click pos ->
-            ( { model | clicked = Just pos }, Cmd.none )
-
         Jump ->
             --( model, Random.generate Resize (Random.float 0 50) )
             ( model, Cmd.none )
@@ -122,13 +114,6 @@ subscriptions model =
 --   Mouse.clicks (\_ -> Shrink)
 --else
 --   Sub.none
-
-
-offsetPosition : Decoder Position
-offsetPosition =
-    Json.Decode.object2 Position
-        ("offsetX" := Json.Decode.int)
-        ("offsetY" := Json.Decode.int)
 
 
 svgbasics =
