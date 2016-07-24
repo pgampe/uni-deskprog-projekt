@@ -1,8 +1,8 @@
 module Main exposing (..)
 
 import Html exposing (..)
-import Html.Events exposing (..)
-import Html.App exposing (program)
+import Svg.Events exposing (..)
+import Html.App as App
 import Markdown
 import Element
 import Color exposing (..)
@@ -13,16 +13,7 @@ import Random
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import List exposing (..)
-
-
-type Msg
-    = --Enlarge
-      Reset
-      --| Tick Time
-      --| Shrink
-    | Click Position
-    | Jump
-
+import Dice
 
 
 --| Resize Float
@@ -41,16 +32,16 @@ type alias PiecePosition =
 
 
 type alias Model =
-    { clicked : Maybe Position, players : List Player, next : Player }
+    { clicked : Maybe Position, players : List Player, next : Player, dice : Dice.Model }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( { clicked = Nothing, players = [ { offset = 0, pieces = [] } ], next = { offset = 0, pieces = [] } }, Cmd.none )
+    ( { clicked = Nothing, players = [ { offset = 0, pieces = [] } ], next = { offset = 0, pieces = [] }, dice = Dice.init }, Cmd.none )
 
 
 main =
-    program
+    App.program
         { init = init
         , view = view
         , update = update
@@ -58,17 +49,33 @@ main =
         }
 
 
+type Msg
+    = --Enlarge
+      Reset
+      --| Tick Time
+      --| Shrink
+    | Click Position
+    | Jump
+    | Roll Dice.Msg
+
+
 
 -- https://de.wikipedia.org/wiki/Datei:Dontworry.svg
 
 
-view : Model -> Svg Msg
 view model =
     Svg.svg [ width "1500", height "1700" ]
-        (concat [ svgbasics, svgdefs, svgoutersquares, svglines, svgarrows, svgletters, (positionsToSvg availablePositions) ])
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
+        (concat
+            [ svgbasics
+            , svgdefs
+            , svgoutersquares
+            , svglines
+            , svgarrows
+            , svgletters
+            , (positionsToSvg availablePositions)
+            , [ (App.map Roll (Dice.view model.dice)) ]
+            ]
+        )
 
 
 
@@ -86,6 +93,9 @@ update msg model =
         Jump ->
             --( model, Random.generate Resize (Random.float 0 50) )
             ( model, Cmd.none )
+
+        Roll msg ->
+            ( { model | dice = fst (Dice.update Dice.Roll model.dice) }, Cmd.none )
 
 
 
@@ -184,7 +194,7 @@ svgdefs =
 
 
 svgoutersquares =
-    [ rect [ x "0", y "0", width "1500", height "1700", fill "#ffff80", stroke "red", strokeWidth "35" ] []
+    [ rect [ x "0", y "0", width "1500", height "1700", fill "#ffff80", stroke "red", strokeWidth "35", onClick Reset ] []
     , rect [ x "43", y "43", width "1407", height "1407", fill "none", stroke "black", strokeWidth "7" ] []
     ]
 
