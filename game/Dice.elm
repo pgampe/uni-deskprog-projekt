@@ -84,3 +84,7 @@ view model =
 
         _ ->
             svg [] []
+
+
+subscriptions model =
+    Sub.none

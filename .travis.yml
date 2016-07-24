@@ -14,5 +14,5 @@ before_script:
 script:
   - cd game
   - elm make --yes --output game.html game.elm
-  - ../bin/elm-format --validate game.elm
+  - ../bin/elm-format --validate *.elm
 #  - node tests/test.js
