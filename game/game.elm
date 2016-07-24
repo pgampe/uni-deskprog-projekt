@@ -64,7 +64,7 @@ main =
 
 view : Model -> Svg Msg
 view model =
-    Svg.svg [ width "1500", height "1500" ]
+    Svg.svg [ width "1500", height "1700" ]
         (concat [ svgbasics, svgdefs, svgoutersquares, svglines, svgarrows, svgletters, (positionsToSvg availablePositions) ])
 
 
@@ -184,7 +184,7 @@ svgdefs =
 
 
 svgoutersquares =
-    [ rect [ x "0", y "0", width "1500", height "1500", fill "#ffff80", stroke "red", strokeWidth "35" ] []
+    [ rect [ x "0", y "0", width "1500", height "1700", fill "#ffff80", stroke "red", strokeWidth "35" ] []
     , rect [ x "43", y "43", width "1407", height "1407", fill "none", stroke "black", strokeWidth "7" ] []
     ]
 
