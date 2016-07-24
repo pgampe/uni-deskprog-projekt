@@ -1,6 +1,7 @@
 module Main exposing (..)
 
-import Html exposing (..)
+import Svg exposing (..)
+import Svg.Attributes exposing (..)
 import Svg.Events exposing (..)
 import Html.App as App
 import Markdown
@@ -10,8 +11,6 @@ import Time exposing (Time, second)
 import Mouse exposing (Position)
 import Json.Decode exposing (Decoder, (:=))
 import Random
-import Svg exposing (..)
-import Svg.Attributes exposing (..)
 import List exposing (..)
 import Dice
 
@@ -56,7 +55,8 @@ type Msg
       --| Shrink
     | Click Position
     | Jump
-    | Roll Dice.Msg
+    | RollDice
+    | SetDice Int
 
 
 
@@ -73,7 +73,7 @@ view model =
             , svgarrows
             , svgletters
             , (positionsToSvg availablePositions)
-            , [ (App.map Roll (Dice.view model.dice)) ]
+            , [ (viewForDice model.dice) ]
             ]
         )
 
@@ -94,8 +94,11 @@ update msg model =
             --( model, Random.generate Resize (Random.float 0 50) )
             ( model, Cmd.none )
 
-        Roll msg ->
-            ( { model | dice = fst (Dice.update Dice.Roll model.dice) }, Cmd.none )
+        RollDice ->
+            ( model, Random.generate SetDice (Random.int 1 6) )
+
+        SetDice newValue ->
+            ( { model | dice = newValue }, Cmd.none )
 
 
 
@@ -129,8 +132,8 @@ offsetPosition =
 
 
 svgbasics =
-    [ Svg.title [] [ Html.text "Don't worry" ]
-    , desc [] [ Html.text "Don't worry" ]
+    [ Svg.title [] [ Svg.text "Don't worry" ]
+    , desc [] [ Svg.text "Don't worry" ]
     ]
 
 
@@ -148,7 +151,7 @@ svgdefs =
         , line [ id "lh", x1 "0", y1 "0", x2 "25", y2 "0", stroke "black", strokeWidth "7" ] []
         , line [ id "lv", x1 "0", y1 "0", x2 "0", y2 "25", stroke "black", strokeWidth "7" ] []
         , symbol [ id "arrow" ]
-            [ desc [] [ Html.text "arrow" ]
+            [ desc [] [ Svg.text "arrow" ]
             , line [ x1 "750", y1 "750", x2 "872", y2 "750", stroke "black", strokeWidth "2" ] []
             , line [ x1 "750", y1 "750", x2 "742", y2 "742", stroke "black", strokeWidth "2" ] []
             , line [ x1 "750", y1 "750", x2 "742", y2 "758", stroke "black", strokeWidth "2" ] []
@@ -164,27 +167,27 @@ svgdefs =
             , Svg.path [ d "M 875,750 A 70 20 0 0 0 852,758 l 8,-8" ] []
             ]
         , symbol [ id "ya" ]
-            [ desc [] [ Html.text "yellow A" ]
+            [ desc [] [ Svg.text "yellow A" ]
             , Svg.path [ d "M 722,774 l 18,-56 l 20,0 l 18,56 l -8,0 l -6,-16 l -28,0 l -6,16 l -8,0" ] []
             , Svg.path [ d "M 739,750 l 22,0 l -8,-24 l -6,0 l -8,24", fill "yellow" ] []
             ]
         , symbol [ id "ra" ]
-            [ desc [] [ Html.text "red A" ]
+            [ desc [] [ Svg.text "red A" ]
             , Svg.path [ d "M 722,774 l 18,-56 l 20,0 l 18,56 l -8,0 l -6,-16 l -28,0 l -6,16 l -8,0" ] []
             , Svg.path [ d "M 739,750 l 22,0 l -8,-24 l -6,0 l -8,24", fill "red" ] []
             ]
         , symbol [ id "ga" ]
-            [ desc [] [ Html.text "green A" ]
+            [ desc [] [ Svg.text "green A" ]
             , Svg.path [ d "M 722,774 l 18,-56 l 20,0 l 18,56 l -8,0 l -6,-16 l -28,0 l -6,16 l -8,0" ] []
             , Svg.path [ d "M 739,750 l 22,0 l -8,-24 l -6,0 l -8,24", fill "green" ] []
             ]
         , symbol [ id "ba" ]
-            [ desc [] [ Html.text "black A" ]
+            [ desc [] [ Svg.text "black A" ]
             , Svg.path [ d "M 722,774 l 18,-56 l 20,0 l 18,56 l -8,0 l -6,-16 l -28,0 l -6,16 l -8,0", fill "white" ] []
             , Svg.path [ d "M 739,750 l 22,0 l -8,-24 l -6,0 l -8,24", fill "black" ] []
             ]
         , symbol [ id "bb" ]
-            [ desc [] [ Html.text "black B" ]
+            [ desc [] [ Svg.text "black B" ]
             , Svg.path [ d "M 740,770 l 0,-40 l 8,0 A 12,12 0 0 1 750,754 l 0,-8 A 12,12 0 0 1 750,770 l -8,0" ] []
             , Svg.path [ d "M 747,763 l 0,-9 l 1,0 A 6,4.5 0 0 1 748,763 l -1,0", fill "#ffff80" ] []
             , Svg.path [ d "M 747,746 l 0,-9 l 1,0 A 6,4.5 0 0 1 748,746 l -1,0", fill "#ffff80" ] []
@@ -346,3 +349,60 @@ availablePositions =
     , { id = 133, x = 1250, y = 1375, xlinkHref = "#csr", fill = "red" }
     , { id = 134, x = 1375, y = 1375, xlinkHref = "#csr", fill = "red" }
     ]
+
+
+viewForDice model =
+    case model of
+        1 ->
+            svg [ onClick RollDice, x "100", y "1550" ]
+                [ rect [ rx "4", cy "4", width "100", height "100", rx "7", fill "white", stroke "black", strokeWidth "8" ] []
+                , circle [ cx "50", cy "50", r "10", fill "black" ] []
+                ]
+
+        2 ->
+            svg [ onClick RollDice, x "100", y "1550" ]
+                [ rect [ rx "4", cy "4", width "100", height "100", rx "7", fill "white", stroke "black", strokeWidth "8" ] []
+                , circle [ cx "30", cy "50", r "10", fill "black" ] []
+                , circle [ cx "70", cy "50", r "10", fill "black" ] []
+                ]
+
+        3 ->
+            svg [ onClick RollDice, x "100", y "1550" ]
+                [ rect [ rx "4", cy "4", width "100", height "100", rx "7", fill "white", stroke "black", strokeWidth "8" ] []
+                , circle [ cx "25", cy "50", r "10", fill "black" ] []
+                , circle [ cx "50", cy "50", r "10", fill "black" ] []
+                , circle [ cx "75", cy "50", r "10", fill "black" ] []
+                ]
+
+        4 ->
+            svg [ onClick RollDice, x "100", y "1550" ]
+                [ rect [ rx "4", cy "4", width "100", height "100", rx "7", fill "white", stroke "black", strokeWidth "8" ] []
+                , circle [ cx "30", cy "30", r "10", fill "black" ] []
+                , circle [ cx "70", cy "30", r "10", fill "black" ] []
+                , circle [ cx "30", cy "70", r "10", fill "black" ] []
+                , circle [ cx "70", cy "70", r "10", fill "black" ] []
+                ]
+
+        5 ->
+            svg [ onClick RollDice, x "100", y "1550" ]
+                [ rect [ rx "4", cy "4", width "100", height "100", rx "7", fill "white", stroke "black", strokeWidth "8" ] []
+                , circle [ cx "30", cy "30", r "10", fill "black" ] []
+                , circle [ cx "70", cy "30", r "10", fill "black" ] []
+                , circle [ cx "50", cy "50", r "10", fill "black" ] []
+                , circle [ cx "30", cy "70", r "10", fill "black" ] []
+                , circle [ cx "70", cy "70", r "10", fill "black" ] []
+                ]
+
+        6 ->
+            svg [ onClick RollDice, x "100", y "1550" ]
+                [ rect [ rx "4", cy "4", width "100", height "100", rx "7", fill "white", stroke "black", strokeWidth "8" ] []
+                , circle [ cx "25", cy "30", r "10", fill "black" ] []
+                , circle [ cx "50", cy "30", r "10", fill "black" ] []
+                , circle [ cx "75", cy "30", r "10", fill "black" ] []
+                , circle [ cx "25", cy "70", r "10", fill "black" ] []
+                , circle [ cx "50", cy "70", r "10", fill "black" ] []
+                , circle [ cx "75", cy "70", r "10", fill "black" ] []
+                ]
+
+        _ ->
+            svg [] []
