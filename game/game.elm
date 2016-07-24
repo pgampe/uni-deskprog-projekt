@@ -9,17 +9,18 @@ import Json.Decode exposing (Decoder, (:=))
 import Random
 import List exposing (..)
 import Dice
+import Debug exposing (log)
 
 
 --| Resize Float
 
 
 type alias Piece =
-    { id : Int, active : Bool }
+    { id : Int, active : Bool, position : PiecePosition }
 
 
 type alias Player =
-    { offset : Int, pieces : List Piece }
+    { offset : Int, pieces : List Piece, pColor : String }
 
 
 type alias PiecePosition =
@@ -27,12 +28,12 @@ type alias PiecePosition =
 
 
 type alias Model =
-    { players : List Player, next : Player, dice : Dice.Model }
+    { players : List Player, next : Maybe Player, dice : Dice.Model }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( { players = [ { offset = 0, pieces = [] } ], next = { offset = 0, pieces = [] }, dice = Dice.init }, Cmd.none )
+    ( { players = getPlayersWithInitialPositions, next = Nothing, dice = Dice.init }, Cmd.none )
 
 
 main =
@@ -69,21 +70,27 @@ view model =
             , svgletters
             , (positionsToSvg availablePositions)
             , [ (viewForDice model.dice) ]
+            , svgPlayerPositions model.players
             ]
         )
 
 
 
---update msg ({ radius, isRed } as model) =
+{- updateTags state someNewTags =
+   let value = state.currentUserValues
+   in { state | currentUserValues <- { value | tags <- someNewTags } }
+
+   für state.currentUserValues.tags = [tags]
+-}
 
 
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Reset ->
             init
 
         Jump ->
-            --( model, Random.generate Resize (Random.float 0 50) )
             ( model, Cmd.none )
 
         RollDice ->
@@ -93,27 +100,82 @@ update msg model =
             ( { model | dice = newValue }, Cmd.none )
 
 
-
---Resize newRadius ->
---( { model | radius = newRadius }, Cmd.none )
-
-
 subscriptions model =
     Sub.none
 
 
+getPositionFromPositions : Int -> PiecePosition
+getPositionFromPositions x =
+    case head (List.filter (\pos -> x == pos.id) availablePositions) of
+        Nothing ->
+            { id = 9999, x = 0, y = 0, xlinkHref = "#cg", fill = "blue" }
 
---subscriptions { radius } = Sub.none
---Mouse.clicks (\_ -> Shrink)
---if radius > 20 then
---    Sub.batch
---       [ Time.every second Tick
---        , Mouse.clicks (\_ -> Shrink)
---       ]
---else if radius > 0 then
---   Mouse.clicks (\_ -> Shrink)
---else
---   Sub.none
+        Just x ->
+            x
+
+
+getPlayersWithInitialPositions : List Player
+getPlayersWithInitialPositions =
+    [ { offset = 0
+      , pColor = "green"
+      , pieces =
+            [ { id = 1, active = False, position = getPositionFromPositions 101 }
+            , { id = 2, active = False, position = getPositionFromPositions 102 }
+            , { id = 3, active = False, position = getPositionFromPositions 103 }
+            , { id = 4, active = False, position = getPositionFromPositions 104 }
+            ]
+      }
+    , { offset = 10
+      , pColor = "red"
+      , pieces =
+            [ { id = 11, active = False, position = getPositionFromPositions 111 }
+            , { id = 12, active = False, position = getPositionFromPositions 112 }
+            , { id = 13, active = False, position = getPositionFromPositions 113 }
+            , { id = 14, active = False, position = getPositionFromPositions 114 }
+            ]
+      }
+    , { offset = 20
+      , pColor = "black"
+      , pieces =
+            [ { id = 21, active = False, position = getPositionFromPositions 121 }
+            , { id = 22, active = False, position = getPositionFromPositions 122 }
+            , { id = 23, active = False, position = getPositionFromPositions 123 }
+            , { id = 24, active = False, position = getPositionFromPositions 124 }
+            ]
+      }
+    , { offset = 30
+      , pColor = "yellow"
+      , pieces =
+            [ { id = 31, active = False, position = getPositionFromPositions 131 }
+            , { id = 32, active = False, position = getPositionFromPositions 132 }
+            , { id = 33, active = False, position = getPositionFromPositions 133 }
+            , { id = 34, active = False, position = getPositionFromPositions 134 }
+            ]
+      }
+    ]
+
+
+svgPlayerPositions : List Player -> List (Svg use)
+svgPlayerPositions players =
+    concatMap playersToPiecesAndColor players |> map (\( p, c ) -> svgFromPieceAndColor p c)
+
+
+playersToPiecesAndColor : Player -> List ( Piece, String )
+playersToPiecesAndColor pl =
+    let
+        pieces =
+            pl.pieces
+    in
+        map (\p -> ( p, pl.pColor )) pieces
+
+
+svgFromPieceAndColor : Piece -> String -> Svg use
+svgFromPieceAndColor piece c =
+    let
+        p =
+            piece.position
+    in
+        use [ x (toString (p.x - 50)), y (toString (p.y - 130)), xlinkHref "#piece", fill c ] []
 
 
 svgbasics =
@@ -122,6 +184,7 @@ svgbasics =
     ]
 
 
+svgdefs : List (Svg defs)
 svgdefs =
     [ defs []
         [ circle [ id "cw", cx "0", cy "0", r "50", stroke "black", strokeWidth "7" ] []
@@ -177,6 +240,19 @@ svgdefs =
             , Svg.path [ d "M 747,763 l 0,-9 l 1,0 A 6,4.5 0 0 1 748,763 l -1,0", fill "#ffff80" ] []
             , Svg.path [ d "M 747,746 l 0,-9 l 1,0 A 6,4.5 0 0 1 748,746 l -1,0", fill "#ffff80" ] []
             ]
+        , linearGradient [ id "GradientPiece" ]
+            [ stop [ offset "0", stopColor "white", stopOpacity "0" ] []
+            , stop [ offset "1", stopColor "white", stopOpacity "1" ] []
+            ]
+        , Svg.mask [ id "MaskPiece" ]
+            [ polygon [ points "10,0 90,0 90,180 10,180", fill "url(#GradientPiece)" ] []
+            ]
+        , svg [ id "piece" ]
+            [ circle [ cx "50", cy "40", r "30" ] []
+            , circle [ cx "50", cy "40", r "30", fill "black", Svg.Attributes.mask "url(#MaskPiece)" ] []
+            , Svg.path [ d "M50,30 L90,150 Q 50,180 10,150" ] []
+            , Svg.path [ d "M50,30 L90,150 Q 50,180 10,150", fill "black", Svg.Attributes.mask "url(#MaskPiece)" ] []
+            ]
         ]
     ]
 
@@ -187,6 +263,7 @@ svgoutersquares =
     ]
 
 
+svglines : List (Svg use)
 svglines =
     [ use [ x "675", y "125", xlinkHref "#lh" ] []
     , use [ x "800", y "125", xlinkHref "#lh" ] []
@@ -231,6 +308,7 @@ svglines =
     ]
 
 
+svgarrows : List (Svg use)
 svgarrows =
     [ use [ xlinkHref "#arrow", transform "translate(-650,-240)" ] []
     , use [ xlinkHref "#arrow", transform "translate(650,240) rotate(180,750,750)" ] []
@@ -239,6 +317,7 @@ svgarrows =
     ]
 
 
+svgletters : List (Svg use)
 svgletters =
     [ use [ xlinkHref "#ya", transform "translate(-625,-125)" ] []
     , use [ xlinkHref "#ga", transform "translate(125,-625)" ] []
@@ -251,10 +330,12 @@ svgletters =
     ]
 
 
+positionsToSvg : List PiecePosition -> List (Svg use)
 positionsToSvg piecepositions =
     map positionToSvg piecepositions
 
 
+positionToSvg : PiecePosition -> Svg use
 positionToSvg p =
     use [ x (toString p.x), y (toString p.y), xlinkHref p.xlinkHref, fill p.fill ] []
 
@@ -321,18 +402,18 @@ availablePositions =
     , { id = 102, x = 1375, y = 125, xlinkHref = "#csg", fill = "green" }
     , { id = 103, x = 1250, y = 250, xlinkHref = "#csg", fill = "green" }
     , { id = 104, x = 1375, y = 250, xlinkHref = "#csg", fill = "green" }
-    , { id = 111, x = 125, y = 1250, xlinkHref = "#csb", fill = "black" }
-    , { id = 112, x = 250, y = 1250, xlinkHref = "#csb", fill = "black" }
-    , { id = 113, x = 125, y = 1375, xlinkHref = "#csb", fill = "black" }
-    , { id = 114, x = 250, y = 1375, xlinkHref = "#csb", fill = "black" }
-    , { id = 121, x = 125, y = 125, xlinkHref = "#csy", fill = "yellow" }
-    , { id = 122, x = 250, y = 125, xlinkHref = "#csy", fill = "yellow" }
-    , { id = 123, x = 125, y = 250, xlinkHref = "#csy", fill = "yellow" }
-    , { id = 124, x = 250, y = 250, xlinkHref = "#csy", fill = "yellow" }
-    , { id = 131, x = 1250, y = 1250, xlinkHref = "#csr", fill = "red" }
-    , { id = 132, x = 1375, y = 1250, xlinkHref = "#csr", fill = "red" }
-    , { id = 133, x = 1250, y = 1375, xlinkHref = "#csr", fill = "red" }
-    , { id = 134, x = 1375, y = 1375, xlinkHref = "#csr", fill = "red" }
+    , { id = 111, x = 1250, y = 1250, xlinkHref = "#csr", fill = "red" }
+    , { id = 112, x = 1375, y = 1250, xlinkHref = "#csr", fill = "red" }
+    , { id = 113, x = 1250, y = 1375, xlinkHref = "#csr", fill = "red" }
+    , { id = 114, x = 1375, y = 1375, xlinkHref = "#csr", fill = "red" }
+    , { id = 121, x = 125, y = 1250, xlinkHref = "#csb", fill = "black" }
+    , { id = 122, x = 250, y = 1250, xlinkHref = "#csb", fill = "black" }
+    , { id = 123, x = 125, y = 1375, xlinkHref = "#csb", fill = "black" }
+    , { id = 124, x = 250, y = 1375, xlinkHref = "#csb", fill = "black" }
+    , { id = 131, x = 125, y = 125, xlinkHref = "#csy", fill = "yellow" }
+    , { id = 132, x = 250, y = 125, xlinkHref = "#csy", fill = "yellow" }
+    , { id = 133, x = 125, y = 250, xlinkHref = "#csy", fill = "yellow" }
+    , { id = 134, x = 250, y = 250, xlinkHref = "#csy", fill = "yellow" }
     ]
 
 
