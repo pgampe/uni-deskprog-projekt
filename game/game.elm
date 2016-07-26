@@ -69,7 +69,7 @@ view model =
             , svgarrows
             , svgletters
             , (positionsToSvg availablePositions)
-            , [ (viewForDice model.dice) ]
+            , [ (Dice.viewRender [ onClick RollDice ] model.dice) ]
             , svgPlayerPositions (Array.toList model.players)
             ]
         )
@@ -116,43 +116,44 @@ getPositionFromPositions x =
 
 getPlayersWithInitialPositions : Array Player
 getPlayersWithInitialPositions =
-    Array.fromList [ { offset = 0
-      , pColor = "green"
-      , pieces =
-            [ { id = 1, active = False, position = getPositionFromPositions 101 }
-            , { id = 2, active = False, position = getPositionFromPositions 102 }
-            , { id = 3, active = False, position = getPositionFromPositions 103 }
-            , { id = 4, active = False, position = getPositionFromPositions 104 }
-            ]
-      }
-    , { offset = 10
-      , pColor = "red"
-      , pieces =
-            [ { id = 11, active = False, position = getPositionFromPositions 111 }
-            , { id = 12, active = False, position = getPositionFromPositions 112 }
-            , { id = 13, active = False, position = getPositionFromPositions 113 }
-            , { id = 14, active = False, position = getPositionFromPositions 114 }
-            ]
-      }
-    , { offset = 20
-      , pColor = "black"
-      , pieces =
-            [ { id = 21, active = False, position = getPositionFromPositions 121 }
-            , { id = 22, active = False, position = getPositionFromPositions 122 }
-            , { id = 23, active = False, position = getPositionFromPositions 123 }
-            , { id = 24, active = False, position = getPositionFromPositions 124 }
-            ]
-      }
-    , { offset = 30
-      , pColor = "yellow"
-      , pieces =
-            [ { id = 31, active = False, position = getPositionFromPositions 131 }
-            , { id = 32, active = False, position = getPositionFromPositions 132 }
-            , { id = 33, active = False, position = getPositionFromPositions 133 }
-            , { id = 34, active = False, position = getPositionFromPositions 134 }
-            ]
-      }
-    ]
+    Array.fromList
+        [ { offset = 0
+          , pColor = "green"
+          , pieces =
+                [ { id = 1, active = False, position = getPositionFromPositions 101 }
+                , { id = 2, active = False, position = getPositionFromPositions 102 }
+                , { id = 3, active = False, position = getPositionFromPositions 103 }
+                , { id = 4, active = False, position = getPositionFromPositions 104 }
+                ]
+          }
+        , { offset = 10
+          , pColor = "red"
+          , pieces =
+                [ { id = 11, active = False, position = getPositionFromPositions 111 }
+                , { id = 12, active = False, position = getPositionFromPositions 112 }
+                , { id = 13, active = False, position = getPositionFromPositions 113 }
+                , { id = 14, active = False, position = getPositionFromPositions 114 }
+                ]
+          }
+        , { offset = 20
+          , pColor = "black"
+          , pieces =
+                [ { id = 21, active = False, position = getPositionFromPositions 121 }
+                , { id = 22, active = False, position = getPositionFromPositions 122 }
+                , { id = 23, active = False, position = getPositionFromPositions 123 }
+                , { id = 24, active = False, position = getPositionFromPositions 124 }
+                ]
+          }
+        , { offset = 30
+          , pColor = "yellow"
+          , pieces =
+                [ { id = 31, active = False, position = getPositionFromPositions 131 }
+                , { id = 32, active = False, position = getPositionFromPositions 132 }
+                , { id = 33, active = False, position = getPositionFromPositions 133 }
+                , { id = 34, active = False, position = getPositionFromPositions 134 }
+                ]
+          }
+        ]
 
 
 svgPlayerPositions : List Player -> List (Svg use)
