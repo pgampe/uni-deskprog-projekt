@@ -11,9 +11,9 @@ type alias Model =
     Int
 
 
-init : Model
+init : ( Model, Cmd Msg )
 init =
-    1
+    ( 1, Cmd.none )
 
 
 type Msg
