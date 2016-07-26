@@ -28,12 +28,24 @@ type alias PiecePosition =
 
 
 type alias Model =
-    { players : Array Player, currentPlayer : Maybe Player, dice : Dice.Model }
+    { players : Array Player
+    , currentPlayer : Maybe Player
+    , dice : Dice.Model
+    , countOfRolls : Int
+    , playerNeedsToMakeMove : Bool
+    }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( { players = getPlayersWithInitialPositions, currentPlayer = (Array.get 0 getPlayersWithInitialPositions), dice = (fst Dice.init) }, Cmd.none )
+    ( { players = getPlayersWithInitialPositions
+      , currentPlayer = (Array.get 0 getPlayersWithInitialPositions)
+      , dice = (fst Dice.init)
+      , countOfRolls = 0
+      , playerNeedsToMakeMove = False
+      }
+    , Cmd.none
+    )
 
 
 main =
@@ -50,26 +62,6 @@ type Msg
     | Jump
     | RollDice
     | SetDice Int
-
-
-
--- https://de.wikipedia.org/wiki/Datei:Dontworry.svg
-
-
-view model =
-    Svg.svg [ width "1500", height "1700" ]
-        (concat
-            [ svgbasics
-            , svgdefs
-            , svgoutersquares
-            , svglines
-            , svgarrows
-            , svgletters
-            , (positionsToSvg availablePositions)
-            , [ (Dice.viewRender [ onClick RollDice, x "100", y "1550" ] model.dice) ]
-            , svgPlayerPositions (Array.toList model.players)
-            ]
-        )
 
 
 
@@ -94,11 +86,57 @@ update msg model =
             ( model, Random.generate SetDice (Random.int 1 6) )
 
         SetDice newValue ->
-            ( { model | dice = newValue }, Cmd.none )
+            ( { model | dice = newValue, countOfRolls = (model.countOfRolls + 1), playerNeedsToMakeMove = False }, Cmd.none )
 
 
 subscriptions model =
     Sub.none
+
+
+
+-- https://de.wikipedia.org/wiki/Datei:Dontworry.svg
+
+
+view model =
+    Svg.svg [ width "1500", height "1700" ]
+        (concat
+            (renderBoardList model)
+            +++ (getSvgForDice model True)
+        )
+
+
+(+++) : List a -> List a -> List a
+(+++) =
+    List.append
+infixr 5 +++
+
+
+shouldRoleDice : Model -> Bool
+shouldRoleDice model =
+    (model.countOfRolls < 3 || model.dice == 6) && not model.playerNeedsToMakeMove
+
+
+getSvgForDice model requestUpdate =
+    let
+        message =
+            if shouldRoleDice model then
+                [ onClick RollDice ]
+            else
+                []
+    in
+        [ (Dice.viewRender (message +++ [ x "100", y "1550" ]) model.dice) ]
+
+
+renderBoardList model =
+    [ svgbasics
+    , svgdefs
+    , svgoutersquares
+    , svglines
+    , svgarrows
+    , svgletters
+    , (positionsToSvg availablePositions)
+    , svgPlayerPositions (Array.toList model.players)
+    ]
 
 
 getPositionFromPositions : Int -> PiecePosition
