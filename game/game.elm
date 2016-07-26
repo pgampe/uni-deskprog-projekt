@@ -33,7 +33,7 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { players = getPlayersWithInitialPositions, currentPlayer = (Array.get 0 getPlayersWithInitialPositions), dice = Dice.init }, Cmd.none )
+    ( { players = getPlayersWithInitialPositions, currentPlayer = (Array.get 0 getPlayersWithInitialPositions), dice = (fst Dice.init) }, Cmd.none )
 
 
 main =
