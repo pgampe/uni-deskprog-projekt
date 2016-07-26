@@ -9,6 +9,7 @@ import Random
 import List exposing (..)
 import Dice
 import Debug exposing (log)
+import Array exposing (..)
 
 
 --| Resize Float
@@ -27,12 +28,12 @@ type alias PiecePosition =
 
 
 type alias Model =
-    { players : List Player, next : Maybe Player, dice : Dice.Model }
+    { players : Array Player, currentPlayer : Maybe Player, dice : Dice.Model }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( { players = getPlayersWithInitialPositions, next = Nothing, dice = Dice.init }, Cmd.none )
+    ( { players = getPlayersWithInitialPositions, currentPlayer = (Array.get 0 getPlayersWithInitialPositions), dice = Dice.init }, Cmd.none )
 
 
 main =
@@ -69,7 +70,7 @@ view model =
             , svgletters
             , (positionsToSvg availablePositions)
             , [ (viewForDice model.dice) ]
-            , svgPlayerPositions model.players
+            , svgPlayerPositions (Array.toList model.players)
             ]
         )
 
@@ -113,9 +114,9 @@ getPositionFromPositions x =
             x
 
 
-getPlayersWithInitialPositions : List Player
+getPlayersWithInitialPositions : Array Player
 getPlayersWithInitialPositions =
-    [ { offset = 0
+    Array.fromList [ { offset = 0
       , pColor = "green"
       , pieces =
             [ { id = 1, active = False, position = getPositionFromPositions 101 }
@@ -156,7 +157,7 @@ getPlayersWithInitialPositions =
 
 svgPlayerPositions : List Player -> List (Svg use)
 svgPlayerPositions players =
-    concatMap playersToPiecesAndColor players |> map (\( p, c ) -> svgFromPieceAndColor p c)
+    concatMap playersToPiecesAndColor players |> List.map (\( p, c ) -> svgFromPieceAndColor p c)
 
 
 playersToPiecesAndColor : Player -> List ( Piece, String )
@@ -165,7 +166,7 @@ playersToPiecesAndColor pl =
         pieces =
             pl.pieces
     in
-        map (\p -> ( p, pl.pColor )) pieces
+        List.map (\p -> ( p, pl.pColor )) pieces
 
 
 svgFromPieceAndColor : Piece -> String -> Svg use
@@ -331,7 +332,7 @@ svgletters =
 
 positionsToSvg : List PiecePosition -> List (Svg use)
 positionsToSvg piecepositions =
-    map positionToSvg piecepositions
+    List.map positionToSvg piecepositions
 
 
 positionToSvg : PiecePosition -> Svg use
