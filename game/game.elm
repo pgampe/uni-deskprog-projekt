@@ -29,7 +29,7 @@ type alias PiecePosition =
 
 type alias Model =
     { players : Array Player
-    , currentPlayer : Maybe Player
+    , currentPlayer : Int
     , dice : Dice.Model
     , countOfRolls : Int
     , playerNeedsToMakeMove : Bool
@@ -39,7 +39,7 @@ type alias Model =
 init : ( Model, Cmd Msg )
 init =
     ( { players = getPlayersWithInitialPositions
-      , currentPlayer = (Array.get 0 getPlayersWithInitialPositions)
+      , currentPlayer = 0
       , dice = (fst Dice.init)
       , countOfRolls = 0
       , playerNeedsToMakeMove = False
@@ -86,7 +86,13 @@ update msg model =
             ( model, Random.generate SetDice (Random.int 1 6) )
 
         SetDice newValue ->
-            ( { model | dice = newValue, countOfRolls = (model.countOfRolls + 1), playerNeedsToMakeMove = False }, Cmd.none )
+            ( { model
+                | dice = newValue
+                , countOfRolls = (updateRollsCount model.countOfRolls newValue)
+                , playerNeedsToMakeMove = False
+              }
+            , Cmd.none
+            )
 
 
 subscriptions model =
@@ -111,14 +117,27 @@ view model =
 infixr 5 +++
 
 
+updateRollsCount : Int -> Dice.Model -> Int
+updateRollsCount current new =
+    if new == 6 then
+        current
+    else
+        current + 1
+
+
 shouldRoleDice : Model -> Bool
 shouldRoleDice model =
-    (model.countOfRolls < 3 || (model.dice == 6 && playerHasPiecesInGame model.currentPlayer)) && not model.playerNeedsToMakeMove
+    (model.countOfRolls < 3 || (model.dice == 6 && playerHasPiecesInGame model)) && not model.playerNeedsToMakeMove
 
 
-playerHasPiecesInGame : Maybe Player -> Bool
-playerHasPiecesInGame player =
-    case player of
+getCurrentPlayer : Model -> Maybe Player
+getCurrentPlayer model =
+    (Array.get model.currentPlayer model.players)
+
+
+playerHasPiecesInGame : Model -> Bool
+playerHasPiecesInGame model =
+    case getCurrentPlayer model of
         Nothing ->
             False
 
