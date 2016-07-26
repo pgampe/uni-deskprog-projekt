@@ -101,7 +101,7 @@ view model =
     Svg.svg [ width "1500", height "1700" ]
         (concat
             (renderBoardList model)
-            +++ (getSvgForDice model True)
+            +++ (getSvgForDice model)
         )
 
 
@@ -113,10 +113,20 @@ infixr 5 +++
 
 shouldRoleDice : Model -> Bool
 shouldRoleDice model =
-    (model.countOfRolls < 3 || model.dice == 6) && not model.playerNeedsToMakeMove
+    (model.countOfRolls < 3 || (model.dice == 6 && playerHasPiecesInGame model.currentPlayer)) && not model.playerNeedsToMakeMove
 
 
-getSvgForDice model requestUpdate =
+playerHasPiecesInGame : Maybe Player -> Bool
+playerHasPiecesInGame player =
+    case player of
+        Nothing ->
+            False
+
+        Just pl ->
+            List.foldl (\pc c -> pc.active || c) False pl.pieces
+
+
+getSvgForDice model =
     let
         message =
             if shouldRoleDice model then
