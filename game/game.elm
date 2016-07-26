@@ -46,10 +46,7 @@ main =
 
 
 type Msg
-    = --Enlarge
-      Reset
-      --| Tick Time
-      --| Shrink
+    = Reset
     | Jump
     | RollDice
     | SetDice Int
