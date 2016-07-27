@@ -5,6 +5,7 @@ import Svg.Attributes exposing (..)
 import Svg.Events exposing (..)
 import Html.App as App
 import Json.Decode exposing (Decoder, (:=))
+import Json.Encode exposing (..)
 import Random
 import List exposing (..)
 import Dice
@@ -62,6 +63,7 @@ type Msg
     | Jump
     | RollDice
     | SetDice Int
+    | MovePiece Piece
 
 
 
@@ -90,7 +92,13 @@ update msg model =
                 | dice = newValue
                 , countOfRolls = (updateRollsCount model.countOfRolls newValue)
                 , playerNeedsToMakeMove = False
+                , players = (updatePlayersAfterRoll model newValue)
               }
+            , Cmd.none
+            )
+
+        MovePiece piece ->
+            ( model
             , Cmd.none
             )
 
@@ -115,6 +123,65 @@ view model =
 (+++) =
     List.append
 infixr 5 +++
+
+
+updatePlayersAfterRoll : Model -> Dice.Model -> Array Player
+updatePlayersAfterRoll model diceValue =
+    case getCurrentPlayer model of
+        Nothing ->
+            model.players
+
+        Just pl ->
+            Array.set model.currentPlayer (updatePlayerAfterRoll pl diceValue) model.players
+
+
+updatePlayerAfterRoll : Player -> Dice.Model -> Player
+updatePlayerAfterRoll player diceValue =
+    case diceValue of
+        6 ->
+            { player | pieces = makeNextPieceActive player.pieces }
+
+        _ ->
+            player
+
+
+makeNextPieceActive : List Piece -> List Piece
+makeNextPieceActive pieces =
+    let
+        currentPiece =
+            getFirstPiece pieces
+
+        rest =
+            drop 1 pieces
+    in
+        if currentPiece.active then
+            currentPiece :: makeNextPieceActive rest
+        else
+            togglePieceActive (currentPiece) :: rest
+
+
+getFirstPiece : List Piece -> Piece
+getFirstPiece list =
+    case head list of
+        -- Not possible
+        Nothing ->
+            { active = False, id = 999, position = getPositionFromPositions 1 }
+
+        Just x ->
+            x
+
+
+activePiecesInList : List Piece -> Bool
+activePiecesInList pieces =
+    (List.foldl (\pc c -> pc.active || c) False pieces)
+
+
+togglePieceActive : Piece -> Piece
+togglePieceActive piece =
+    if piece.active then
+        { piece | active = False }
+    else
+        { piece | active = True }
 
 
 updateRollsCount : Int -> Dice.Model -> Int
@@ -142,7 +209,7 @@ playerHasPiecesInGame model =
             False
 
         Just pl ->
-            List.foldl (\pc c -> pc.active || c) False pl.pieces
+            activePiecesInList pl.pieces
 
 
 getSvgForDice model =
@@ -220,27 +287,25 @@ getPlayersWithInitialPositions =
         ]
 
 
-svgPlayerPositions : List Player -> List (Svg use)
 svgPlayerPositions players =
-    concatMap playersToPiecesAndColor players |> List.map (\( p, c ) -> svgFromPieceAndColor p c)
+    concatMap playerToPiecesAndColor players |> List.map (\( p, c ) -> svgFromPieceAndColor p c)
 
 
-playersToPiecesAndColor : Player -> List ( Piece, String )
-playersToPiecesAndColor pl =
+playerToPiecesAndColor : Player -> List ( Piece, String )
+playerToPiecesAndColor pl =
+    List.map (\p -> ( p, pl.pColor )) pl.pieces
+
+
+svgFromPieceAndColor : Piece -> String -> Svg Msg
+svgFromPieceAndColor piece color =
     let
-        pieces =
-            pl.pieces
-    in
-        List.map (\p -> ( p, pl.pColor )) pieces
-
-
-svgFromPieceAndColor : Piece -> String -> Svg use
-svgFromPieceAndColor piece c =
-    let
-        p =
+        position =
             piece.position
     in
-        use [ x (toString (p.x - 50)), y (toString (p.y - 130)), xlinkHref "#piece", fill c ] []
+        if piece.active then
+            use [ x (toString (position.x - 50)), y (toString (position.y - 130)), xlinkHref "#piece", fill color, onClick (MovePiece piece) ] []
+        else
+            use [ x (toString (position.x - 50)), y (toString (position.y - 130)), xlinkHref "#piece", fill color ] []
 
 
 svgbasics =
