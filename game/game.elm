@@ -90,9 +90,10 @@ update msg model =
         SetDice newValue ->
             ( { model
                 | dice = newValue
-                , countOfRolls = (updateRollsCount model.countOfRolls newValue)
-                , playerNeedsToMakeMove = log "need moving " (doesPlayerNeedToMoveAfterRoll model newValue)
+                , countOfRolls = log "count rolls dice" (updateRollsCount model.countOfRolls newValue)
+                , playerNeedsToMakeMove = (doesPlayerNeedToMoveAfterRoll model newValue)
                 , players = (updatePlayersAfterRoll model newValue)
+                , currentPlayer = log "current player dice" (updateCurrentPlayerAfterDiceRoll model newValue)
               }
             , Cmd.none
             )
@@ -100,7 +101,8 @@ update msg model =
         MovePiece piece ->
             ( { model
                 | playerNeedsToMakeMove = False
-                , players = log "new player" (updatePlayersAfterMove model piece)
+                , players = (updatePlayersAfterMove model piece)
+                , currentPlayer = log "current player move" (updateCurrentPlayerAfterMove model)
               }
             , Cmd.none
             )
@@ -128,6 +130,22 @@ view model =
 infixr 5 +++
 
 
+updateCurrentPlayerAfterDiceRoll : Model -> Dice.Model -> Int
+updateCurrentPlayerAfterDiceRoll model currentDiceValue =
+    if currentDiceValue == 6 || model.countOfRolls < 2 then
+        model.currentPlayer
+    else
+        (model.currentPlayer + 1) % 4
+
+
+updateCurrentPlayerAfterMove : Model -> Int
+updateCurrentPlayerAfterMove model =
+    if model.dice == 6 then
+        model.currentPlayer
+    else
+        (model.currentPlayer + 1) % 4
+
+
 updatePlayersAfterMove : Model -> Piece -> Array Player
 updatePlayersAfterMove model piece =
     Array.set model.currentPlayer (updatePlayerAfterMove model piece) model.players
@@ -153,31 +171,31 @@ updatePlayerAfterMove model piece =
                 39 ->
                     -- todo: actually check the position (empty, etc)
                     if (model.dice < 6) then
-                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (position.id + model.dice + player.offset)) }
+                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (position.id + model.dice)) }
                     else
                         player
 
                 40 ->
                     if (model.dice < 5) then
-                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (position.id + model.dice + player.offset)) }
+                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (position.id + model.dice)) }
                     else
                         player
 
                 41 ->
                     if (model.dice < 4) then
-                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (position.id + model.dice + player.offset)) }
+                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (position.id + model.dice)) }
                     else
                         player
 
                 42 ->
                     if (model.dice < 3) then
-                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (position.id + model.dice + player.offset)) }
+                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (position.id + model.dice)) }
                     else
                         player
 
                 43 ->
                     if (model.dice < 2) then
-                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (position.id + model.dice + player.offset)) }
+                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (position.id + model.dice)) }
                     else
                         player
 
@@ -187,7 +205,7 @@ updatePlayerAfterMove model piece =
 
                 -- todo: check of field is empty before moving
                 _ ->
-                    { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (position.id + model.dice + player.offset)) }
+                    { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (position.id + model.dice)) }
 
 
 updatePiecePositionInPositions : List Piece -> Int -> Int -> List Piece
@@ -269,7 +287,21 @@ updateRollsCount current new =
     if new == 6 then
         current
     else
-        current + 1
+        case current of
+            3 ->
+                0
+
+            2 ->
+                3
+
+            1 ->
+                2
+
+            0 ->
+                1
+
+            _ ->
+                Debug.crash "We should not roll more than three times"
 
 
 shouldRoleDice : Model -> Bool
@@ -551,7 +583,7 @@ positionsToSvg piecepositions =
 
 positionToSvg : PiecePosition -> Svg use
 positionToSvg p =
-    use [ x (toString p.x), y (toString p.y), xlinkHref p.xlinkHref, fill p.fill ] []
+    use [ x (toString p.x), y (toString p.y), xlinkHref p.xlinkHref, fill p.fill, id (toString p.id) ] []
 
 
 availablePositions : List PiecePosition
