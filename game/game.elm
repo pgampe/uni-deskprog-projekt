@@ -418,21 +418,21 @@ getPlayersWithInitialPositions =
 
 
 svgPlayerPositions model =
-    concatMap playerToPiecesAndColor (Array.toList model.players) |> List.map (\( p, c ) -> svgFromPieceAndColor p c model.playerNeedsToMakeMove)
+    concatMap playerToPiecesAndColor (Array.toList model.players) |> List.map (\( piece, color ) -> svgFromPieceAndColor piece color model.playerNeedsToMakeMove (getCurrentPlayer model))
 
 
 playerToPiecesAndColor : Player -> List ( Piece, String )
-playerToPiecesAndColor pl =
-    List.map (\p -> ( p, pl.pColor )) pl.pieces
+playerToPiecesAndColor player =
+    List.map (\piece -> ( piece, player.pColor )) player.pieces
 
 
-svgFromPieceAndColor : Piece -> String -> Bool -> Svg Msg
-svgFromPieceAndColor piece color piecesCanMove =
+svgFromPieceAndColor : Piece -> String -> Bool -> Player -> Svg Msg
+svgFromPieceAndColor piece color piecesCanMove currentPlayer =
     let
         position =
             piece.position
     in
-        if piece.active && piecesCanMove then
+        if piece.active && piecesCanMove && (currentPlayer.pColor == color) then
             use [ x (toString (position.x - 50)), y (toString (position.y - 130)), xlinkHref "#piece", fill color, onClick (MovePiece piece) ] []
         else
             use [ x (toString (position.x - 50)), y (toString (position.y - 130)), xlinkHref "#piece", fill color ] []
