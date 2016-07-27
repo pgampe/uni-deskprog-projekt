@@ -98,7 +98,10 @@ update msg model =
             )
 
         MovePiece piece ->
-            ( model
+            ( { model
+                | playerNeedsToMakeMove = False
+                , players = log "new player" (updatePlayersAfterMove model piece)
+              }
             , Cmd.none
             )
 
@@ -125,19 +128,59 @@ view model =
 infixr 5 +++
 
 
+updatePlayersAfterMove : Model -> Piece -> Array Player
+updatePlayersAfterMove model piece =
+    Array.set model.currentPlayer (updatePlayerAfterMove (getCurrentPlayer model) piece) model.players
+
+
+updatePlayerAfterMove : Player -> Piece -> Player
+updatePlayerAfterMove player piece =
+    let
+        position =
+            piece.position
+    in
+        if position.id > 100 then
+            -- opening
+            { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (1 + player.offset)) }
+        else
+            -- todo: implement run on board
+            player
+
+
+updatePiecePositionInPositions : List Piece -> Int -> Int -> List Piece
+updatePiecePositionInPositions pieces pieceId positionId =
+    let
+        currentPiece =
+            getFirstUnsafe pieces
+
+        rest =
+            drop 1 pieces
+    in
+        if currentPiece.id == pieceId then
+            { currentPiece | position = getPositionFromPositions positionId } :: rest
+        else
+            currentPiece :: (updatePiecePositionInPositions rest pieceId positionId)
+
+
+getFirstUnsafe : List a -> a
+getFirstUnsafe list =
+    case list of
+        x :: xs ->
+            x
+
+        [] ->
+            -- https://github.com/elm-lang/core/issues/215
+            Debug.crash "List cannot be empty"
+
 
 doesPlayerNeedToMoveAfterRoll : Model -> Dice.Model -> Bool
 doesPlayerNeedToMoveAfterRoll model currentDiceValue =
     playerHasPiecesInGame model || currentDiceValue == 6
 
+
 updatePlayersAfterRoll : Model -> Dice.Model -> Array Player
 updatePlayersAfterRoll model diceValue =
-    case getCurrentPlayer model of
-        Nothing ->
-            model.players
-
-        Just pl ->
-            Array.set model.currentPlayer (updatePlayerAfterRoll pl diceValue) model.players
+    Array.set model.currentPlayer (updatePlayerAfterRoll (getCurrentPlayer model) diceValue) model.players
 
 
 updatePlayerAfterRoll : Player -> Dice.Model -> Player
@@ -154,7 +197,7 @@ makeNextPieceActive : List Piece -> List Piece
 makeNextPieceActive pieces =
     let
         currentPiece =
-            getFirstPiece pieces
+            getFirstUnsafe pieces
 
         rest =
             drop 1 pieces
@@ -163,17 +206,6 @@ makeNextPieceActive pieces =
             currentPiece :: makeNextPieceActive rest
         else
             togglePieceActive (currentPiece) :: rest
-
-
-getFirstPiece : List Piece -> Piece
-getFirstPiece list =
-    case head list of
-        -- Not possible
-        Nothing ->
-            { active = False, id = 999, position = getPositionFromPositions 1 }
-
-        Just x ->
-            x
 
 
 activePiecesInList : List Piece -> Bool
@@ -202,19 +234,23 @@ shouldRoleDice model =
     (model.countOfRolls < 3 || (model.dice == 6 && playerHasPiecesInGame model)) && not model.playerNeedsToMakeMove
 
 
-getCurrentPlayer : Model -> Maybe Player
+getCurrentPlayer : Model -> Player
 getCurrentPlayer model =
-    (Array.get model.currentPlayer model.players)
+    case (Array.get model.currentPlayer model.players) of
+        Nothing ->
+            Debug.crash "Wrong player selected"
+
+        Just player ->
+            player
 
 
 playerHasPiecesInGame : Model -> Bool
 playerHasPiecesInGame model =
-    case getCurrentPlayer model of
-        Nothing ->
-            False
-
-        Just pl ->
-            activePiecesInList pl.pieces
+    let
+        player =
+            getCurrentPlayer model
+    in
+        activePiecesInList player.pieces
 
 
 getSvgForDice model =
