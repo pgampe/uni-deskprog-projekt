@@ -130,21 +130,64 @@ infixr 5 +++
 
 updatePlayersAfterMove : Model -> Piece -> Array Player
 updatePlayersAfterMove model piece =
-    Array.set model.currentPlayer (updatePlayerAfterMove (getCurrentPlayer model) piece) model.players
+    Array.set model.currentPlayer (updatePlayerAfterMove model piece) model.players
 
 
-updatePlayerAfterMove : Player -> Piece -> Player
-updatePlayerAfterMove player piece =
+updatePlayerAfterMove : Model -> Piece -> Player
+updatePlayerAfterMove model piece =
     let
+        player =
+            getCurrentPlayer model
+
         position =
             piece.position
+
+        currentPosition =
+            position.id - player.offset
     in
-        if position.id > 100 then
+        if currentPosition > 100 then
             -- opening
             { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (1 + player.offset)) }
         else
-            -- todo: implement run on board
-            player
+            case (currentPosition) of
+                39 ->
+                    -- todo: actually check the position (empty, etc)
+                    if (model.dice < 6) then
+                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (position.id + model.dice + player.offset)) }
+                    else
+                        player
+
+                40 ->
+                    if (model.dice < 5) then
+                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (position.id + model.dice + player.offset)) }
+                    else
+                        player
+
+                41 ->
+                    if (model.dice < 4) then
+                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (position.id + model.dice + player.offset)) }
+                    else
+                        player
+
+                42 ->
+                    if (model.dice < 3) then
+                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (position.id + model.dice + player.offset)) }
+                    else
+                        player
+
+                43 ->
+                    if (model.dice < 2) then
+                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (position.id + model.dice + player.offset)) }
+                    else
+                        player
+
+                -- no further move possible
+                44 ->
+                    player
+
+                -- todo: check of field is empty before moving
+                _ ->
+                    { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (position.id + model.dice + player.offset)) }
 
 
 updatePiecePositionInPositions : List Piece -> Int -> Int -> List Piece
@@ -272,7 +315,7 @@ renderBoardList model =
     , svgarrows
     , svgletters
     , (positionsToSvg availablePositions)
-    , svgPlayerPositions (Array.toList model.players)
+    , (svgPlayerPositions model)
     ]
 
 
@@ -328,8 +371,8 @@ getPlayersWithInitialPositions =
         ]
 
 
-svgPlayerPositions players =
-    concatMap playerToPiecesAndColor players |> List.map (\( p, c ) -> svgFromPieceAndColor p c)
+svgPlayerPositions model =
+    concatMap playerToPiecesAndColor (Array.toList model.players) |> List.map (\( p, c ) -> svgFromPieceAndColor p c model.playerNeedsToMakeMove)
 
 
 playerToPiecesAndColor : Player -> List ( Piece, String )
@@ -337,13 +380,13 @@ playerToPiecesAndColor pl =
     List.map (\p -> ( p, pl.pColor )) pl.pieces
 
 
-svgFromPieceAndColor : Piece -> String -> Svg Msg
-svgFromPieceAndColor piece color =
+svgFromPieceAndColor : Piece -> String -> Bool -> Svg Msg
+svgFromPieceAndColor piece color piecesCanMove =
     let
         position =
             piece.position
     in
-        if piece.active then
+        if piece.active && piecesCanMove then
             use [ x (toString (position.x - 50)), y (toString (position.y - 130)), xlinkHref "#piece", fill color, onClick (MovePiece piece) ] []
         else
             use [ x (toString (position.x - 50)), y (toString (position.y - 130)), xlinkHref "#piece", fill color ] []
