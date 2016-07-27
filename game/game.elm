@@ -90,7 +90,7 @@ update msg model =
         SetDice newValue ->
             ( { model
                 | dice = newValue
-                , countOfRolls = log "count rolls dice" (updateRollsCount model.countOfRolls newValue)
+                , countOfRolls = log "count rolls dice" (updateRollsCountAfterDiceRoll model.countOfRolls newValue)
                 , playerNeedsToMakeMove = (doesPlayerNeedToMoveAfterRoll model newValue)
                 , players = (updatePlayersAfterRoll model newValue)
                 , currentPlayer = log "current player dice" (updateCurrentPlayerAfterDiceRoll model newValue)
@@ -101,6 +101,7 @@ update msg model =
         MovePiece piece ->
             ( { model
                 | playerNeedsToMakeMove = False
+                , countOfRolls = 0
                 , players = (updatePlayersAfterMove model piece)
                 , currentPlayer = log "current player move" (updateCurrentPlayerAfterMove model)
               }
@@ -132,7 +133,7 @@ infixr 5 +++
 
 updateCurrentPlayerAfterDiceRoll : Model -> Dice.Model -> Int
 updateCurrentPlayerAfterDiceRoll model currentDiceValue =
-    if currentDiceValue == 6 || model.countOfRolls < 2 then
+    if currentDiceValue == 6 || log "value of dice roll count in model before current player update" (model.countOfRolls) < 2 then
         model.currentPlayer
     else
         (model.currentPlayer + 1) % 4
@@ -153,6 +154,7 @@ updatePlayersAfterMove model piece =
 
 updatePlayerAfterMove : Model -> Piece -> Player
 updatePlayerAfterMove model piece =
+    -- todo: update active piece list in dock
     let
         player =
             getCurrentPlayer model
@@ -163,7 +165,7 @@ updatePlayerAfterMove model piece =
         currentPosition =
             position.id - player.offset
     in
-        if currentPosition > 100 then
+        if (log "current position" currentPosition) > 100 then
             -- opening
             { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (1 + player.offset)) }
         else
@@ -171,19 +173,19 @@ updatePlayerAfterMove model piece =
                 39 ->
                     -- todo: actually check the position (empty, etc)
                     if (model.dice < 6) then
-                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (position.id + model.dice)) }
+                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (calculateNewPosition currentPosition model.dice player.offset)) }
                     else
                         player
 
                 40 ->
                     if (model.dice < 5) then
-                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (position.id + model.dice)) }
+                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (calculateNewPosition currentPosition model.dice player.offset)) }
                     else
                         player
 
                 41 ->
                     if (model.dice < 4) then
-                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (position.id + model.dice)) }
+                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (calculateNewPosition currentPosition model.dice player.offset)) }
                     else
                         player
 
@@ -195,7 +197,7 @@ updatePlayerAfterMove model piece =
 
                 43 ->
                     if (model.dice < 2) then
-                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (position.id + model.dice)) }
+                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (calculateNewPosition currentPosition model.dice player.offset)) }
                     else
                         player
 
@@ -205,7 +207,19 @@ updatePlayerAfterMove model piece =
 
                 -- todo: check of field is empty before moving
                 _ ->
-                    { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (position.id + model.dice)) }
+                    { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (log "next position" (calculateNewPosition currentPosition model.dice player.offset))) }
+
+
+calculateNewPosition : Int -> Dice.Model -> Int -> Int
+calculateNewPosition currentPosition currentDiceValue playerOffset =
+    let
+        newPosition =
+            currentPosition + currentDiceValue
+    in
+        if newPosition < 41 then
+            (newPosition + playerOffset) % 40
+        else
+            newPosition + playerOffset
 
 
 updatePiecePositionInPositions : List Piece -> Int -> Int -> List Piece
@@ -282,17 +296,17 @@ togglePieceActive piece =
         { piece | active = True }
 
 
-updateRollsCount : Int -> Dice.Model -> Int
-updateRollsCount current new =
+updateRollsCountAfterDiceRoll : Int -> Dice.Model -> Int
+updateRollsCountAfterDiceRoll current new =
     if new == 6 then
-        current
+        0
     else
         case current of
             3 ->
-                0
+                Debug.crash "Why did we hit three rolls in a row?"
 
             2 ->
-                3
+                0
 
             1 ->
                 2
@@ -599,10 +613,10 @@ availablePositions =
     , { id = 9, x = 1375, y = 625, xlinkHref = "#cw", fill = "white" }
     , { id = 10, x = 1375, y = 750, xlinkHref = "#cw", fill = "white" }
     , { id = 11, x = 1375, y = 875, xlinkHref = "#cr", fill = "red" }
-    , { id = 12, x = 875, y = 875, xlinkHref = "#cw", fill = "white" }
-    , { id = 13, x = 1250, y = 875, xlinkHref = "#cw", fill = "white" }
-    , { id = 14, x = 1125, y = 875, xlinkHref = "#cw", fill = "white" }
-    , { id = 15, x = 1000, y = 875, xlinkHref = "#cw", fill = "white" }
+    , { id = 12, x = 1250, y = 875, xlinkHref = "#cw", fill = "white" }
+    , { id = 13, x = 1125, y = 875, xlinkHref = "#cw", fill = "white" }
+    , { id = 14, x = 1000, y = 875, xlinkHref = "#cw", fill = "white" }
+    , { id = 15, x = 875, y = 875, xlinkHref = "#cw", fill = "white" }
     , { id = 16, x = 875, y = 1000, xlinkHref = "#cw", fill = "white" }
     , { id = 17, x = 875, y = 1125, xlinkHref = "#cw", fill = "white" }
     , { id = 18, x = 875, y = 1250, xlinkHref = "#cw", fill = "white" }
