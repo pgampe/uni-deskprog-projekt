@@ -91,7 +91,7 @@ update msg model =
             ( { model
                 | dice = newValue
                 , countOfRolls = (updateRollsCount model.countOfRolls newValue)
-                , playerNeedsToMakeMove = False
+                , playerNeedsToMakeMove = log "need moving " (doesPlayerNeedToMoveAfterRoll model newValue)
                 , players = (updatePlayersAfterRoll model newValue)
               }
             , Cmd.none
@@ -124,6 +124,11 @@ view model =
     List.append
 infixr 5 +++
 
+
+
+doesPlayerNeedToMoveAfterRoll : Model -> Dice.Model -> Bool
+doesPlayerNeedToMoveAfterRoll model currentDiceValue =
+    playerHasPiecesInGame model || currentDiceValue == 6
 
 updatePlayersAfterRoll : Model -> Dice.Model -> Array Player
 updatePlayersAfterRoll model diceValue =
