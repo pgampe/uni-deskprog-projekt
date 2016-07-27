@@ -215,11 +215,17 @@ calculateNewPosition currentPosition currentDiceValue playerOffset =
     let
         newPosition =
             currentPosition + currentDiceValue
+
+        realPosition =
+            newPosition + playerOffset
     in
         if newPosition < 41 then
-            (newPosition + playerOffset) % 40
+            if (realPosition % 40) == 0 then
+                40
+            else
+                realPosition % 40
         else
-            newPosition + playerOffset
+            realPosition
 
 
 updatePiecePositionInPositions : List Piece -> Int -> Int -> List Piece
@@ -433,9 +439,9 @@ svgFromPieceAndColor piece color piecesCanMove currentPlayer =
             piece.position
     in
         if piece.active && piecesCanMove && (currentPlayer.pColor == color) then
-            use [ x (toString (position.x - 50)), y (toString (position.y - 130)), xlinkHref "#piece", fill color, onClick (MovePiece piece) ] []
+            use [ id (toString piece.position.id), x (toString (position.x - 50)), y (toString (position.y - 130)), xlinkHref "#piece", fill color, onClick (MovePiece piece) ] []
         else
-            use [ x (toString (position.x - 50)), y (toString (position.y - 130)), xlinkHref "#piece", fill color ] []
+            use [ id (toString piece.position.id), x (toString (position.x - 50)), y (toString (position.y - 130)), xlinkHref "#piece", fill color ] []
 
 
 svgbasics =
