@@ -356,7 +356,19 @@ getSvgForDice model =
             else
                 []
     in
-        [ (Dice.viewRender (message +++ [ x "100", y "1550" ]) model.dice) ]
+        [ (Dice.viewRender (message +++ [ x "100", y "1550" ]) model.dice (getDiceColor model)) ]
+
+
+getDiceColor : Model -> String
+getDiceColor model =
+    let
+        player =
+            getCurrentPlayer model
+    in
+        if model.playerNeedsToMakeMove then
+            "white"
+        else
+            player.pColor
 
 
 renderBoardList model =
