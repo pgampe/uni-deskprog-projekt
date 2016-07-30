@@ -11,7 +11,6 @@ Travis CI Status [![Build Status](https://travis-ci.org/pgampe/uni-deskprog-proj
 Current Problems
 ----------------
 
- * List of active pieces needs to be updated if a player chooses not to move out on six (easy)
  * Missing collision detection and actually kicking out players (medium)
  * And game positions are properly off and might need some special handling (easy)
  * Concept for automatic player moves (medium)

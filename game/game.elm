@@ -154,7 +154,6 @@ updatePlayersAfterMove model piece =
 
 updatePlayerAfterMove : Model -> Piece -> Player
 updatePlayerAfterMove model piece =
-    -- todo: update active piece list in dock
     let
         player =
             getCurrentPlayer model
@@ -167,37 +166,37 @@ updatePlayerAfterMove model piece =
     in
         if (log "current position" currentPosition) > 100 then
             -- opening
-            { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (1 + player.offset)) }
+            { player | pieces = (List.map (\currentPiece -> updatePiecePositionInPositions currentPiece piece.id (1 + player.offset)) player.pieces) }
         else
             case (currentPosition) of
                 39 ->
                     -- todo: actually check the position (empty, etc)
                     if (model.dice < 6) then
-                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (calculateNewPosition currentPosition model.dice player.offset)) }
+                        { player | pieces = (List.map (\currentPiece -> updatePiecePositionInPositions currentPiece piece.id (calculateNewPosition currentPosition model.dice player.offset)) player.pieces) }
                     else
                         player
 
                 40 ->
                     if (model.dice < 5) then
-                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (calculateNewPosition currentPosition model.dice player.offset)) }
+                        { player | pieces = (List.map (\currentPiece -> updatePiecePositionInPositions currentPiece piece.id (calculateNewPosition currentPosition model.dice player.offset)) player.pieces) }
                     else
                         player
 
                 41 ->
                     if (model.dice < 4) then
-                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (calculateNewPosition currentPosition model.dice player.offset)) }
+                        { player | pieces = (List.map (\currentPiece -> updatePiecePositionInPositions currentPiece piece.id (calculateNewPosition currentPosition model.dice player.offset)) player.pieces) }
                     else
                         player
 
                 42 ->
                     if (model.dice < 3) then
-                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (position.id + model.dice)) }
+                        { player | pieces = (List.map (\currentPiece -> updatePiecePositionInPositions currentPiece piece.id (calculateNewPosition currentPosition model.dice player.offset)) player.pieces) }
                     else
                         player
 
                 43 ->
                     if (model.dice < 2) then
-                        { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (calculateNewPosition currentPosition model.dice player.offset)) }
+                        { player | pieces = (List.map (\currentPiece -> updatePiecePositionInPositions currentPiece piece.id (calculateNewPosition currentPosition model.dice player.offset)) player.pieces) }
                     else
                         player
 
@@ -207,7 +206,7 @@ updatePlayerAfterMove model piece =
 
                 -- todo: check of field is empty before moving
                 _ ->
-                    { player | pieces = (updatePiecePositionInPositions player.pieces piece.id (log "next position" (calculateNewPosition currentPosition model.dice player.offset))) }
+                    { player | pieces = (List.map (\currentPiece -> updatePiecePositionInPositions currentPiece piece.id (log "next position" (calculateNewPosition currentPosition model.dice player.offset))) player.pieces) }
 
 
 calculateNewPosition : Int -> Dice.Model -> Int -> Int
@@ -228,19 +227,18 @@ calculateNewPosition currentPosition currentDiceValue playerOffset =
             realPosition
 
 
-updatePiecePositionInPositions : List Piece -> Int -> Int -> List Piece
-updatePiecePositionInPositions pieces pieceId positionId =
-    let
-        currentPiece =
-            getFirstUnsafe pieces
-
-        rest =
-            drop 1 pieces
-    in
-        if currentPiece.id == pieceId then
-            { currentPiece | position = getPositionFromPositions positionId } :: rest
-        else
-            currentPiece :: (updatePiecePositionInPositions rest pieceId positionId)
+updatePiecePositionInPositions : Piece -> Int -> Int -> Piece
+updatePiecePositionInPositions piece pieceId positionId =
+    if piece.id == pieceId then
+        { piece | position = getPositionFromPositions positionId }
+    else
+        { piece
+            | active =
+                if piece.position.id < 100 then
+                    True
+                else
+                    False
+        }
 
 
 getFirstUnsafe : List a -> a
