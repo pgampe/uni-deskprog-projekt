@@ -345,7 +345,7 @@ getSvgForDice model =
     let
         message =
             if shouldRoleDice model then
-                [ onClick RollDice ]
+                [ onClick RollDice, Svg.Attributes.style "curser: pointer;" ]
             else
                 []
     in
