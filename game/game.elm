@@ -4,16 +4,11 @@ import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Svg.Events exposing (..)
 import Html.App as App
-import Json.Decode exposing (Decoder, (:=))
-import Json.Encode exposing (..)
 import Random
 import List exposing (..)
 import Dice
 import Debug exposing (log)
 import Array exposing (..)
-
-
---| Resize Float
 
 
 type alias Piece =
