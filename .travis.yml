@@ -4,13 +4,12 @@ cache:
   directories:
     - game/elm-stuff
 node_js:
-  - "4.3"
+  - "4.4"
 install:
-  - npm install -g elm@0.17.0
+  - npm install -g elm@0.17.1
 before_script:
   - bash game/setup.sh
 script:
   - cd game
   - elm make --yes --output game.html game.elm
   - ../bin/elm-format --validate *.elm
-#  - node tests/test.js
