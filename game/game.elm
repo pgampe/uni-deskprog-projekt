@@ -131,7 +131,7 @@ updateCurrentPlayerAfterDiceRoll model currentDiceValue =
     if currentDiceValue == 6 || log "value of dice roll count in model before current player update" (model.countOfRolls) < 2 then
         model.currentPlayer
     else
-        (model.currentPlayer + 1) % 4
+        (model.currentPlayer + 10) % 40
 
 
 updateCurrentPlayerAfterMove : Model -> Int
@@ -139,112 +139,70 @@ updateCurrentPlayerAfterMove model =
     if model.dice == 6 then
         model.currentPlayer
     else
-        (model.currentPlayer + 1) % 4
+        (model.currentPlayer + 10) % 40
 
 
 updatePlayersAfterMove : Model -> Piece -> Array Player
 updatePlayersAfterMove model piece =
-    Array.set model.currentPlayer (updatePlayerAfterMove model piece) model.players
+    (Array.map (\player -> updatePlayerAfterMove player model.currentPlayer piece model.dice) model.players)
 
 
-updatePlayerAfterMove : Model -> Piece -> Player
-updatePlayerAfterMove model piece =
+updatePlayerAfterMove : Player -> Int -> Piece -> Dice.Model -> Player
+updatePlayerAfterMove player currentPlayerOffset movedPiece currentDiceValue =
+    if (player.offset == currentPlayerOffset) then
+        { player | pieces = ((List.map (\piece -> updatePiecePositionAfterMove piece movedPiece.id currentDiceValue player) player.pieces)) }
+    else
+        player
+
+
+calculateNewPositionOnField : Int -> Int -> Int
+calculateNewPositionOnField newRelativePosition playerOffset =
     let
-        player =
-            getCurrentPlayer model
-
-        position =
-            piece.position
-
-        currentPosition =
-            position.id - player.offset
-    in
-        if (log "current position" currentPosition) > 100 then
-            -- opening
-            { player | pieces = (List.map (\currentPiece -> updatePiecePositionInPositions currentPiece piece.id (1 + player.offset)) player.pieces) }
-        else
-            case (currentPosition) of
-                39 ->
-                    -- todo: actually check the position (empty, etc)
-                    if (model.dice < 6) then
-                        { player | pieces = (List.map (\currentPiece -> updatePiecePositionInPositions currentPiece piece.id (calculateNewPosition currentPosition model.dice player.offset)) player.pieces) }
-                    else
-                        player
-
-                40 ->
-                    if (model.dice < 5) then
-                        { player | pieces = (List.map (\currentPiece -> updatePiecePositionInPositions currentPiece piece.id (calculateNewPosition currentPosition model.dice player.offset)) player.pieces) }
-                    else
-                        player
-
-                41 ->
-                    if (model.dice < 4) then
-                        { player | pieces = (List.map (\currentPiece -> updatePiecePositionInPositions currentPiece piece.id (calculateNewPosition currentPosition model.dice player.offset)) player.pieces) }
-                    else
-                        player
-
-                42 ->
-                    if (model.dice < 3) then
-                        { player | pieces = (List.map (\currentPiece -> updatePiecePositionInPositions currentPiece piece.id (calculateNewPosition currentPosition model.dice player.offset)) player.pieces) }
-                    else
-                        player
-
-                43 ->
-                    if (model.dice < 2) then
-                        { player | pieces = (List.map (\currentPiece -> updatePiecePositionInPositions currentPiece piece.id (calculateNewPosition currentPosition model.dice player.offset)) player.pieces) }
-                    else
-                        player
-
-                -- no further move possible
-                44 ->
-                    player
-
-                -- todo: check of field is empty before moving
-                _ ->
-                    { player | pieces = (List.map (\currentPiece -> updatePiecePositionInPositions currentPiece piece.id (log "next position" (calculateNewPosition currentPosition model.dice player.offset))) player.pieces) }
-
-
-calculateNewPosition : Int -> Dice.Model -> Int -> Int
-calculateNewPosition currentPosition currentDiceValue playerOffset =
-    let
-        newPosition =
-            currentPosition + currentDiceValue
-
         realPosition =
-            newPosition + playerOffset
+            newRelativePosition + playerOffset
     in
-        if newPosition < 41 then
+        if newRelativePosition < 41 then
             if (realPosition % 40) == 0 then
                 40
             else
                 realPosition % 40
         else
-            realPosition
+            case newRelativePosition of
+                41 ->
+                    41 + playerOffset
+
+                42 ->
+                    42 + playerOffset
+
+                43 ->
+                    43 + playerOffset
+
+                44 ->
+                    44 + playerOffset
+
+                _ ->
+                    Debug.crash "Relative position overflow."
 
 
-updatePiecePositionInPositions : Piece -> Int -> Int -> Piece
-updatePiecePositionInPositions piece pieceId positionId =
-    if piece.id == pieceId then
-        { piece | position = getPositionFromPositions positionId }
-    else
-        { piece
-            | active =
-                if piece.position.id < 100 then
-                    True
-                else
-                    False
-        }
-
-
-getFirstUnsafe : List a -> a
-getFirstUnsafe list =
-    case list of
-        x :: xs ->
-            x
-
-        [] ->
-            -- https://github.com/elm-lang/core/issues/215
-            Debug.crash "List cannot be empty"
+updatePiecePositionAfterMove : Piece -> Int -> Dice.Model -> Player -> Piece
+updatePiecePositionAfterMove piece movedPieceId currentDiceValue player =
+    let
+        newRelativePosition =
+            piece.relativePosition + currentDiceValue
+    in
+        if piece.id == movedPieceId then
+            { piece
+                | position = getPositionFromPositions (calculateNewPositionOnField newRelativePosition player.offset)
+                , relativePosition = newRelativePosition
+            }
+        else
+            { piece
+                | active =
+                    if piece.position.id < 100 then
+                        True
+                    else
+                        False
+            }
 
 
 doesPlayerNeedToMoveAfterRoll : Model -> Dice.Model -> Bool
