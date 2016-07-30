@@ -372,6 +372,7 @@ renderBoardList model =
     , svgarrows
     , svgletters
     , (positionsToSvg availablePositions)
+    , (positionsToSvgNumbers availablePositions)
     , (svgPlayerPositions model)
     ]
 
@@ -617,6 +618,23 @@ positionsToSvg piecepositions =
 positionToSvg : PiecePosition -> Svg use
 positionToSvg p =
     use [ x (toString p.x), y (toString p.y), xlinkHref p.xlinkHref, fill p.fill, id (toString p.id) ] []
+
+
+positionsToSvgNumbers : List PiecePosition -> List (Svg use)
+positionsToSvgNumbers piecepositions =
+    let
+        printPositionNumbers =
+            False
+    in
+        if (printPositionNumbers) then
+            List.map positionToSvg piecepositions
+        else
+            []
+
+
+positionToSvgNumber : PiecePosition -> Svg use
+positionToSvgNumber p =
+    svg [ width "50", height "50", x (toString (p.x + 25)), y (toString (p.y + 25)), fill p.fill ] [ Svg.text (toString p.id) ]
 
 
 availablePositions : List PiecePosition
