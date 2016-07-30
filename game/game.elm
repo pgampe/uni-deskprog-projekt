@@ -12,7 +12,7 @@ import Array exposing (..)
 
 
 type alias Piece =
-    { id : Int, active : Bool, position : PiecePosition }
+    { id : Int, active : Bool, position : PiecePosition, relativePosition : Int }
 
 
 type alias Player =
@@ -392,37 +392,37 @@ getPlayersWithInitialPositions =
         [ { offset = 0
           , pColor = "green"
           , pieces =
-                [ { id = 1, active = False, position = getPositionFromPositions 101 }
-                , { id = 2, active = False, position = getPositionFromPositions 102 }
-                , { id = 3, active = False, position = getPositionFromPositions 103 }
-                , { id = 4, active = False, position = getPositionFromPositions 104 }
+                [ { id = 1, active = False, position = getPositionFromPositions 101, relativePosition = 0 }
+                , { id = 2, active = False, position = getPositionFromPositions 102, relativePosition = 0 }
+                , { id = 3, active = False, position = getPositionFromPositions 103, relativePosition = 0 }
+                , { id = 4, active = False, position = getPositionFromPositions 104, relativePosition = 0 }
                 ]
           }
         , { offset = 10
           , pColor = "red"
           , pieces =
-                [ { id = 11, active = False, position = getPositionFromPositions 111 }
-                , { id = 12, active = False, position = getPositionFromPositions 112 }
-                , { id = 13, active = False, position = getPositionFromPositions 113 }
-                , { id = 14, active = False, position = getPositionFromPositions 114 }
+                [ { id = 11, active = False, position = getPositionFromPositions 111, relativePosition = 0 }
+                , { id = 12, active = False, position = getPositionFromPositions 112, relativePosition = 0 }
+                , { id = 13, active = False, position = getPositionFromPositions 113, relativePosition = 0 }
+                , { id = 14, active = False, position = getPositionFromPositions 114, relativePosition = 0 }
                 ]
           }
         , { offset = 20
           , pColor = "black"
           , pieces =
-                [ { id = 21, active = False, position = getPositionFromPositions 121 }
-                , { id = 22, active = False, position = getPositionFromPositions 122 }
-                , { id = 23, active = False, position = getPositionFromPositions 123 }
-                , { id = 24, active = False, position = getPositionFromPositions 124 }
+                [ { id = 21, active = False, position = getPositionFromPositions 121, relativePosition = 0 }
+                , { id = 22, active = False, position = getPositionFromPositions 122, relativePosition = 0 }
+                , { id = 23, active = False, position = getPositionFromPositions 123, relativePosition = 0 }
+                , { id = 24, active = False, position = getPositionFromPositions 124, relativePosition = 0 }
                 ]
           }
         , { offset = 30
           , pColor = "yellow"
           , pieces =
-                [ { id = 31, active = False, position = getPositionFromPositions 131 }
-                , { id = 32, active = False, position = getPositionFromPositions 132 }
-                , { id = 33, active = False, position = getPositionFromPositions 133 }
-                , { id = 34, active = False, position = getPositionFromPositions 134 }
+                [ { id = 31, active = False, position = getPositionFromPositions 131, relativePosition = 0 }
+                , { id = 32, active = False, position = getPositionFromPositions 132, relativePosition = 0 }
+                , { id = 33, active = False, position = getPositionFromPositions 133, relativePosition = 0 }
+                , { id = 34, active = False, position = getPositionFromPositions 134, relativePosition = 0 }
                 ]
           }
         ]
