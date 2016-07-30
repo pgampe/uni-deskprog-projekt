@@ -82,13 +82,13 @@ update msg model =
         RollDice ->
             ( model, Random.generate SetDice (Random.int 1 6) )
 
-        SetDice newValue ->
+        SetDice newDiceValue ->
             ( { model
-                | dice = newValue
-                , countOfRolls = log "count rolls dice" (updateRollsCountAfterDiceRoll model.countOfRolls newValue)
-                , playerNeedsToMakeMove = (doesPlayerNeedToMoveAfterRoll model newValue)
-                , players = (updatePlayersAfterRoll model newValue)
-                , currentPlayer = log "current player dice" (updateCurrentPlayerAfterDiceRoll model newValue)
+                | dice = newDiceValue
+                , countOfRolls = (updateRollsCountAfterDiceRoll model.countOfRolls newDiceValue)
+                , playerNeedsToMakeMove = (doesPlayerNeedToMoveAfterRoll model newDiceValue)
+                , players = (updatePlayersAfterRoll model newDiceValue)
+                , currentPlayer = (updateCurrentPlayerAfterDiceRoll model newDiceValue)
               }
             , Cmd.none
             )
@@ -98,7 +98,7 @@ update msg model =
                 | playerNeedsToMakeMove = False
                 , countOfRolls = 0
                 , players = (updatePlayersAfterMove model piece)
-                , currentPlayer = log "current player move" (updateCurrentPlayerAfterMove model)
+                , currentPlayer = (updateCurrentPlayerAfterMove model)
               }
             , Cmd.none
             )
