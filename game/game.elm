@@ -261,38 +261,20 @@ updatePlayerAfterRoll : Player -> Dice.Model -> Player
 updatePlayerAfterRoll player diceValue =
     case diceValue of
         6 ->
-            { player | pieces = makeNextPieceActive player.pieces }
+            { player | pieces = (List.map makePieceActive player.pieces) }
 
         _ ->
             player
 
 
-makeNextPieceActive : List Piece -> List Piece
-makeNextPieceActive pieces =
-    let
-        currentPiece =
-            getFirstUnsafe pieces
-
-        rest =
-            drop 1 pieces
-    in
-        if currentPiece.active then
-            currentPiece :: makeNextPieceActive rest
-        else
-            togglePieceActive (currentPiece) :: rest
+makePieceActive : Piece -> Piece
+makePieceActive currentPiece =
+    { currentPiece | active = True }
 
 
 activePiecesInList : List Piece -> Bool
 activePiecesInList pieces =
     (List.foldl (\pc c -> pc.active || c) False pieces)
-
-
-togglePieceActive : Piece -> Piece
-togglePieceActive piece =
-    if piece.active then
-        { piece | active = False }
-    else
-        { piece | active = True }
 
 
 updateRollsCountAfterDiceRoll : Int -> Dice.Model -> Int
