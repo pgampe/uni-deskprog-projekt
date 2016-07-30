@@ -442,11 +442,19 @@ svgFromPieceAndColor piece color piecesCanMove currentPlayer =
     let
         position =
             piece.position
+
+        baseAttributes =
+            [ id (toString piece.position.id)
+            , x (toString (position.x - 50))
+            , y (toString (position.y - 130))
+            , xlinkHref "#piece"
+            , fill color
+            ]
     in
         if piece.active && piecesCanMove && (currentPlayer.pColor == color) then
-            use [ id (toString piece.position.id), x (toString (position.x - 50)), y (toString (position.y - 130)), xlinkHref "#piece", fill color, onClick (MovePiece piece) ] []
+            use (baseAttributes ++ [ onClick (MovePiece piece), Svg.Attributes.style "curser: pointer;" ]) []
         else
-            use [ id (toString piece.position.id), x (toString (position.x - 50)), y (toString (position.y - 130)), xlinkHref "#piece", fill color ] []
+            use baseAttributes []
 
 
 svgbasics =
