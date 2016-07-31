@@ -235,7 +235,7 @@ pieceCanBeMoved newRelativePosition pieces =
         isOtherPieceInTheWay =
             List.foldl (\piece result -> result || piece.relativePosition == newRelativePosition) False pieces
     in
-        newRelativePosition < 44 && not isOtherPieceInTheWay
+        newRelativePosition < 45 && not isOtherPieceInTheWay
 
 
 updatePlayersAfterRoll : Model -> Dice.Model -> Array Player
