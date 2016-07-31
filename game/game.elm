@@ -285,7 +285,7 @@ getSvgForDice model =
     let
         message =
             if shouldRoleDice model then
-                [ onClick RollDice, Svg.Attributes.style "curser: pointer;" ]
+                [ onClick RollDice, Svg.Attributes.style "cursor: pointer;" ]
             else
                 []
     in
@@ -393,7 +393,7 @@ svgFromPieceAndColor piece color piecesCanMove currentPlayer =
             ]
     in
         if piece.active && piecesCanMove && (currentPlayer.pColor == color) then
-            use (baseAttributes ++ [ onClick (MovePiece piece), Svg.Attributes.style "curser: pointer;" ]) []
+            use (baseAttributes ++ [ onClick (MovePiece piece), Svg.Attributes.style "cursor: pointer;" ]) []
         else
             use baseAttributes []
 
