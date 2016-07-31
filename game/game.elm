@@ -134,7 +134,7 @@ printMoveText model =
 
 updateCurrentPlayerAfterDiceRoll : Model -> Dice.Model -> Int
 updateCurrentPlayerAfterDiceRoll model currentDiceValue =
-    if (currentDiceValue == 6 || (model.countOfRolls) < 2) && doesPlayerNeedToMoveAfterRoll model currentDiceValue then
+    if (currentDiceValue == 6 && (playerCanMakeMove model currentDiceValue) || (model.countOfRolls) < 2) then
         model.currentPlayer
     else
         (model.currentPlayer + 10) % 40
