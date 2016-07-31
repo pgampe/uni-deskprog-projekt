@@ -117,6 +117,7 @@ view model =
         (concat
             (renderBoardList model)
             +++ (getSvgForDice model)
+            +++ (printMoveText model)
         )
 
 
@@ -124,6 +125,19 @@ view model =
 (+++) =
     List.append
 infixr 5 +++
+
+
+printMoveText : Model -> List (Svg text')
+printMoveText model =
+    let
+        player =
+            getCurrentPlayer model
+    in
+        if model.playerNeedsToMakeMove then
+            [ Svg.text' [ x (toString 302), y (toString 1627), fill "black", fontSize (toString 100) ] [ Svg.text "Please move" ]
+            , Svg.text' [ x (toString 300), y (toString 1625), fill player.pColor, fontSize (toString 100) ] [ Svg.text "Please move" ] ]
+        else
+            []
 
 
 updateCurrentPlayerAfterDiceRoll : Model -> Dice.Model -> Int
@@ -578,7 +592,7 @@ positionsToSvgNumbers piecepositions =
 
 positionToSvgNumber : PiecePosition -> Svg use
 positionToSvgNumber p =
-    Svg.text' [x (toString (p.x + 50)), y (toString (p.y + 50)), fontSize (toString 30)] [Svg.text (toString p.id)]
+    Svg.text' [ x (toString (p.x + 50)), y (toString (p.y + 50)), fontSize (toString 30) ] [ Svg.text (toString p.id) ]
 
 
 availablePositions : List PiecePosition
