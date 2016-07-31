@@ -8,14 +8,18 @@ für vier Spieler umsetzen werden. Dabei sollen Spieler 2-4 auch als
 
 Travis CI Status [![Build Status](https://travis-ci.org/pgampe/uni-deskprog-projekt.svg?branch=master)](https://travis-ci.org/pgampe/uni-deskprog-projekt)
 
-Current Problems
-----------------
+Current Problems and ideas
+--------------------------
 
  * Players currently do not need to clear the A area and are not forced to move out
  * Concept for automatic player moves (medium)
  * Game board components for interacting (e.g. selecting number of bots) (easy)
  * Concept and implementation of a ranking after end of game (medium)
  
+Status
+------
+
+You can try a demo on [github pages](https://pgampe.github.io/uni-deskprog-projekt/Index.html).
  
 Concept
 -------
