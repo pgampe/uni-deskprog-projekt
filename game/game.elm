@@ -314,9 +314,9 @@ renderBoardList model =
     , svgoutersquares
     , svglines
     , svgarrows
-    , svgletters
     , (positionsToSvg availablePositions)
     , (positionsToSvgNumbers availablePositions)
+    , svgletters
     , (svgPlayerPositions model)
     ]
 
@@ -325,7 +325,7 @@ getPositionFromPositions : Int -> PiecePosition
 getPositionFromPositions x =
     case head (List.filter (\pos -> x == pos.id) availablePositions) of
         Nothing ->
-            { id = 9999, x = 0, y = 0, xlinkHref = "#cg", fill = "blue" }
+            { id = 9999, x = 0, y = 0, xlinkHref = "#cg", fill = "purple" }
 
         Just x ->
             x
@@ -353,7 +353,7 @@ getPlayersWithInitialPositions =
                 ]
           }
         , { offset = 20
-          , pColor = "black"
+          , pColor = "lightblue"
           , pieces =
                 [ { id = 21, active = False, position = getPositionFromPositions 121, relativePosition = 0 }
                 , { id = 22, active = False, position = getPositionFromPositions 122, relativePosition = 0 }
@@ -454,9 +454,9 @@ svgdefs =
             , Svg.path [ d "M 739,750 l 22,0 l -8,-24 l -6,0 l -8,24", fill "green" ] []
             ]
         , symbol [ id "ba" ]
-            [ desc [] [ Svg.text "black A" ]
-            , Svg.path [ d "M 722,774 l 18,-56 l 20,0 l 18,56 l -8,0 l -6,-16 l -28,0 l -6,16 l -8,0", fill "white" ] []
-            , Svg.path [ d "M 739,750 l 22,0 l -8,-24 l -6,0 l -8,24", fill "black" ] []
+            [ desc [] [ Svg.text "lightblue A" ]
+            , Svg.path [ d "M 722,774 l 18,-56 l 20,0 l 18,56 l -8,0 l -6,-16 l -28,0 l -6,16 l -8,0" ] []
+            , Svg.path [ d "M 739,750 l 22,0 l -8,-24 l -6,0 l -8,24", fill "lightblue" ] []
             ]
         , symbol [ id "bb" ]
             [ desc [] [ Svg.text "black B" ]
@@ -568,7 +568,7 @@ positionsToSvgNumbers : List PiecePosition -> List (Svg use)
 positionsToSvgNumbers piecepositions =
     let
         printPositionNumbers =
-            True
+            False
     in
         if (printPositionNumbers) then
             List.map positionToSvgNumber piecepositions
@@ -603,7 +603,7 @@ availablePositions =
     , { id = 18, x = 875, y = 1250, xlinkHref = "#cw", fill = "white" }
     , { id = 19, x = 875, y = 1375, xlinkHref = "#cw", fill = "white" }
     , { id = 20, x = 750, y = 1375, xlinkHref = "#cw", fill = "white" }
-    , { id = 21, x = 625, y = 1375, xlinkHref = "#cb", fill = "black" }
+    , { id = 21, x = 625, y = 1375, xlinkHref = "#cb", fill = "lightblue" }
     , { id = 22, x = 625, y = 1250, xlinkHref = "#cw", fill = "white" }
     , { id = 23, x = 625, y = 1125, xlinkHref = "#cw", fill = "white" }
     , { id = 24, x = 625, y = 1000, xlinkHref = "#cw", fill = "white" }
@@ -631,10 +631,10 @@ availablePositions =
     , { id = 52, x = 1125, y = 750, xlinkHref = "#csr", fill = "red" }
     , { id = 53, x = 1000, y = 750, xlinkHref = "#csr", fill = "red" }
     , { id = 54, x = 875, y = 750, xlinkHref = "#csr", fill = "red" }
-    , { id = 61, x = 750, y = 1250, xlinkHref = "#csb", fill = "black" }
-    , { id = 62, x = 750, y = 1125, xlinkHref = "#csb", fill = "black" }
-    , { id = 63, x = 750, y = 1000, xlinkHref = "#csb", fill = "black" }
-    , { id = 64, x = 750, y = 875, xlinkHref = "#csb", fill = "black" }
+    , { id = 61, x = 750, y = 1250, xlinkHref = "#csb", fill = "lightblue" }
+    , { id = 62, x = 750, y = 1125, xlinkHref = "#csb", fill = "lightblue" }
+    , { id = 63, x = 750, y = 1000, xlinkHref = "#csb", fill = "lightblue" }
+    , { id = 64, x = 750, y = 875, xlinkHref = "#csb", fill = "lightblue" }
     , { id = 71, x = 250, y = 750, xlinkHref = "#csy", fill = "yellow" }
     , { id = 72, x = 375, y = 750, xlinkHref = "#csy", fill = "yellow" }
     , { id = 73, x = 500, y = 750, xlinkHref = "#csy", fill = "yellow" }
@@ -647,10 +647,10 @@ availablePositions =
     , { id = 112, x = 1375, y = 1250, xlinkHref = "#csr", fill = "red" }
     , { id = 113, x = 1250, y = 1375, xlinkHref = "#csr", fill = "red" }
     , { id = 114, x = 1375, y = 1375, xlinkHref = "#csr", fill = "red" }
-    , { id = 121, x = 125, y = 1250, xlinkHref = "#csb", fill = "black" }
-    , { id = 122, x = 250, y = 1250, xlinkHref = "#csb", fill = "black" }
-    , { id = 123, x = 125, y = 1375, xlinkHref = "#csb", fill = "black" }
-    , { id = 124, x = 250, y = 1375, xlinkHref = "#csb", fill = "black" }
+    , { id = 121, x = 125, y = 1250, xlinkHref = "#csb", fill = "lightblue" }
+    , { id = 122, x = 250, y = 1250, xlinkHref = "#csb", fill = "lightblue" }
+    , { id = 123, x = 125, y = 1375, xlinkHref = "#csb", fill = "lightblue" }
+    , { id = 124, x = 250, y = 1375, xlinkHref = "#csb", fill = "lightblue" }
     , { id = 131, x = 125, y = 125, xlinkHref = "#csy", fill = "yellow" }
     , { id = 132, x = 250, y = 125, xlinkHref = "#csy", fill = "yellow" }
     , { id = 133, x = 125, y = 250, xlinkHref = "#csy", fill = "yellow" }
