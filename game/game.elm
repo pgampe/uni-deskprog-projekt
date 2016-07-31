@@ -188,7 +188,11 @@ updatePiecePositionAfterMove : Piece -> Int -> Dice.Model -> Player -> Piece
 updatePiecePositionAfterMove piece movedPieceId currentDiceValue player =
     let
         newRelativePosition =
-            piece.relativePosition + currentDiceValue
+            if piece.relativePosition == 0 then
+                -- move out of yard
+                1
+            else
+                piece.relativePosition + currentDiceValue
     in
         if piece.id == movedPieceId then
             { piece
