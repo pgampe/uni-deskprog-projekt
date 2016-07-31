@@ -237,14 +237,14 @@ updatePlayerAfterRoll : Player -> Dice.Model -> Player
 updatePlayerAfterRoll player diceValue =
     case diceValue of
         6 ->
-            { player | pieces = (List.map makePieceActive player.pieces) }
+            { player | pieces = (List.map makeMovablePieceActive player.pieces) }
 
         _ ->
             player
 
 
-makePieceActive : Piece -> Piece
-makePieceActive currentPiece =
+makeMovablePieceActive : Piece -> Piece
+makeMovablePieceActive currentPiece =
     { currentPiece | active = True }
 
 
