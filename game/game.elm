@@ -568,17 +568,17 @@ positionsToSvgNumbers : List PiecePosition -> List (Svg use)
 positionsToSvgNumbers piecepositions =
     let
         printPositionNumbers =
-            False
+            True
     in
         if (printPositionNumbers) then
-            List.map positionToSvg piecepositions
+            List.map positionToSvgNumber piecepositions
         else
             []
 
 
 positionToSvgNumber : PiecePosition -> Svg use
 positionToSvgNumber p =
-    svg [ width "50", height "50", x (toString (p.x + 25)), y (toString (p.y + 25)), fill p.fill ] [ Svg.text (toString p.id) ]
+    Svg.text' [x (toString (p.x + 50)), y (toString (p.y + 50)), fontSize (toString 30)] [Svg.text (toString p.id)]
 
 
 availablePositions : List PiecePosition
@@ -627,14 +627,14 @@ availablePositions =
     , { id = 42, x = 750, y = 375, xlinkHref = "#csg", fill = "green" }
     , { id = 43, x = 750, y = 500, xlinkHref = "#csg", fill = "green" }
     , { id = 44, x = 750, y = 625, xlinkHref = "#csg", fill = "green" }
-    , { id = 51, x = 875, y = 750, xlinkHref = "#csr", fill = "red" }
-    , { id = 52, x = 1000, y = 750, xlinkHref = "#csr", fill = "red" }
-    , { id = 53, x = 1125, y = 750, xlinkHref = "#csr", fill = "red" }
-    , { id = 54, x = 1250, y = 750, xlinkHref = "#csr", fill = "red" }
-    , { id = 61, x = 750, y = 875, xlinkHref = "#csb", fill = "black" }
-    , { id = 62, x = 750, y = 1000, xlinkHref = "#csb", fill = "black" }
-    , { id = 63, x = 750, y = 1125, xlinkHref = "#csb", fill = "black" }
-    , { id = 64, x = 750, y = 1250, xlinkHref = "#csb", fill = "black" }
+    , { id = 51, x = 1250, y = 750, xlinkHref = "#csr", fill = "red" }
+    , { id = 52, x = 1125, y = 750, xlinkHref = "#csr", fill = "red" }
+    , { id = 53, x = 1000, y = 750, xlinkHref = "#csr", fill = "red" }
+    , { id = 54, x = 875, y = 750, xlinkHref = "#csr", fill = "red" }
+    , { id = 61, x = 750, y = 1250, xlinkHref = "#csb", fill = "black" }
+    , { id = 62, x = 750, y = 1125, xlinkHref = "#csb", fill = "black" }
+    , { id = 63, x = 750, y = 1000, xlinkHref = "#csb", fill = "black" }
+    , { id = 64, x = 750, y = 875, xlinkHref = "#csb", fill = "black" }
     , { id = 71, x = 250, y = 750, xlinkHref = "#csy", fill = "yellow" }
     , { id = 72, x = 375, y = 750, xlinkHref = "#csy", fill = "yellow" }
     , { id = 73, x = 500, y = 750, xlinkHref = "#csy", fill = "yellow" }
