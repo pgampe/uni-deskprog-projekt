@@ -128,7 +128,7 @@ infixr 5 +++
 
 updateCurrentPlayerAfterDiceRoll : Model -> Dice.Model -> Int
 updateCurrentPlayerAfterDiceRoll model currentDiceValue =
-    if currentDiceValue == 6 || log "value of dice roll count in model before current player update" (model.countOfRolls) < 2 then
+    if currentDiceValue == 6 || (model.countOfRolls) < 2 then
         model.currentPlayer
     else
         (model.currentPlayer + 10) % 40
@@ -212,7 +212,7 @@ doesPlayerNeedToMoveAfterRoll model currentDiceValue =
 
 updatePlayersAfterRoll : Model -> Dice.Model -> Array Player
 updatePlayersAfterRoll model diceValue =
-    Array.set model.currentPlayer (updatePlayerAfterRoll (getCurrentPlayer model) diceValue) model.players
+    Array.set (model.currentPlayer // 10) (updatePlayerAfterRoll (getCurrentPlayer model) diceValue) model.players
 
 
 updatePlayerAfterRoll : Player -> Dice.Model -> Player
@@ -264,7 +264,7 @@ shouldRoleDice model =
 
 getCurrentPlayer : Model -> Player
 getCurrentPlayer model =
-    case (Array.get model.currentPlayer model.players) of
+    case (Array.get (model.currentPlayer // 10) model.players) of
         Nothing ->
             Debug.crash "Wrong player selected"
 
