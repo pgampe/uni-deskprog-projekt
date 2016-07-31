@@ -135,7 +135,8 @@ printMoveText model =
     in
         if model.playerNeedsToMakeMove then
             [ Svg.text' [ x (toString 302), y (toString 1627), fill "black", fontSize (toString 100) ] [ Svg.text "Please move" ]
-            , Svg.text' [ x (toString 300), y (toString 1625), fill player.pColor, fontSize (toString 100) ] [ Svg.text "Please move" ] ]
+            , Svg.text' [ x (toString 300), y (toString 1625), fill player.pColor, fontSize (toString 100) ] [ Svg.text "Please move" ]
+            ]
         else
             []
 
