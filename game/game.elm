@@ -155,10 +155,30 @@ updatePlayersAfterMove model piece =
 
 updatePlayerAfterMove : Player -> Int -> Piece -> Dice.Model -> Player
 updatePlayerAfterMove player currentPlayerOffset movedPiece currentDiceValue =
-    if (player.offset == currentPlayerOffset) then
-        { player | pieces = ((List.map (\piece -> updatePiecePositionAfterMove piece movedPiece.id currentDiceValue player) player.pieces)) }
+    let
+        newRelativePosition =
+            if movedPiece.relativePosition == 0 then
+                -- move out of yard
+                1
+            else
+                movedPiece.relativePosition + currentDiceValue
+
+        newPositionOnField =
+            (calculateNewPositionOnField newRelativePosition currentPlayerOffset)
+    in
+        if (player.offset == currentPlayerOffset) then
+            { player | pieces = (List.map (\piece -> updatePiecePositionAfterMove piece movedPiece.id newPositionOnField newRelativePosition) player.pieces) }
+        else
+            { player | pieces = (List.map (\piece -> updateOtherPlayerPieceAfterMove piece newPositionOnField) player.pieces) }
+
+
+updateOtherPlayerPieceAfterMove : Piece -> Int -> Piece
+updateOtherPlayerPieceAfterMove piece movedPositionId =
+    if piece.position.id == movedPositionId then
+        -- piece has been kicked out
+        { piece | position = (getPositionFromPositions (100 + piece.id)), relativePosition = 0, active = False }
     else
-        player
+        piece
 
 
 calculateNewPositionOnField : Int -> Int -> Int
@@ -190,29 +210,21 @@ calculateNewPositionOnField newRelativePosition playerOffset =
                     Debug.crash "Relative position overflow."
 
 
-updatePiecePositionAfterMove : Piece -> Int -> Dice.Model -> Player -> Piece
-updatePiecePositionAfterMove piece movedPieceId currentDiceValue player =
-    let
-        newRelativePosition =
-            if piece.relativePosition == 0 then
-                -- move out of yard
-                1
-            else
-                piece.relativePosition + currentDiceValue
-    in
-        if piece.id == movedPieceId then
-            { piece
-                | position = getPositionFromPositions (calculateNewPositionOnField newRelativePosition player.offset)
-                , relativePosition = newRelativePosition
-            }
-        else
-            { piece
-                | active =
-                    if piece.position.id < 100 then
-                        True
-                    else
-                        False
-            }
+updatePiecePositionAfterMove : Piece -> Int -> Int -> Int -> Piece
+updatePiecePositionAfterMove piece movedPieceId newPositionOnField newRelativePosition =
+    if piece.id == movedPieceId then
+        { piece
+            | position = getPositionFromPositions newPositionOnField
+            , relativePosition = newRelativePosition
+        }
+    else
+        { piece
+            | active =
+                if piece.position.id < 100 then
+                    True
+                else
+                    False
+        }
 
 
 doesPlayerNeedToMoveAfterRoll : Model -> Dice.Model -> Bool

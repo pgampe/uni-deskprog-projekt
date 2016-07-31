@@ -11,8 +11,7 @@ Travis CI Status [![Build Status](https://travis-ci.org/pgampe/uni-deskprog-proj
 Current Problems
 ----------------
 
- * Missing collision detection and actually kicking out players (medium)
- * And game positions are properly off and might need some special handling (easy)
+ * Players currently do not need to clear the A area and are not forced to move out
  * Concept for automatic player moves (medium)
  * Game board components for interacting (e.g. selecting number of bots) (easy)
  * Concept and implementation of a ranking after end of game (medium)
