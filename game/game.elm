@@ -61,15 +61,6 @@ type Msg
     | MovePiece Piece
 
 
-
-{- updateTags state someNewTags =
-   let value = state.currentUserValues
-   in { state | currentUserValues <- { value | tags <- someNewTags } }
-
-   für state.currentUserValues.tags = [tags]
--}
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -143,7 +134,7 @@ printMoveText model =
 
 updateCurrentPlayerAfterDiceRoll : Model -> Dice.Model -> Int
 updateCurrentPlayerAfterDiceRoll model currentDiceValue =
-    if currentDiceValue == 6 || (model.countOfRolls) < 2 then
+    if (currentDiceValue == 6 || (model.countOfRolls) < 2) && doesPlayerNeedToMoveAfterRoll model currentDiceValue then
         model.currentPlayer
     else
         (model.currentPlayer + 10) % 40
@@ -226,7 +217,25 @@ updatePiecePositionAfterMove piece movedPieceId currentDiceValue player =
 
 doesPlayerNeedToMoveAfterRoll : Model -> Dice.Model -> Bool
 doesPlayerNeedToMoveAfterRoll model currentDiceValue =
-    playerHasPiecesInGame model || currentDiceValue == 6
+    (playerHasPiecesInGame model || currentDiceValue == 6) && playerCanMakeMove model currentDiceValue
+
+
+playerCanMakeMove : Model -> Dice.Model -> Bool
+playerCanMakeMove model currentDiceValue =
+    let
+        player =
+            getCurrentPlayer model
+    in
+        List.foldl (\piece result -> result || (pieceCanBeMoved (piece.relativePosition + currentDiceValue) player.pieces)) False player.pieces
+
+
+pieceCanBeMoved : Int -> List Piece -> Bool
+pieceCanBeMoved newRelativePosition pieces =
+    let
+        isOtherPieceInTheWay =
+            List.foldl (\piece result -> result || piece.relativePosition == newRelativePosition) False pieces
+    in
+        newRelativePosition < 44 && not isOtherPieceInTheWay
 
 
 updatePlayersAfterRoll : Model -> Dice.Model -> Array Player
@@ -389,7 +398,7 @@ getPlayersWithInitialPositions =
 
 
 svgPlayerPositions model =
-    concatMap playerToPiecesAndColor (Array.toList model.players) |> List.map (\( piece, color ) -> svgFromPieceAndColor piece color model.playerNeedsToMakeMove (getCurrentPlayer model))
+    concatMap playerToPiecesAndColor (Array.toList model.players) |> List.map (\( piece, color ) -> svgFromPieceAndColor piece color model (getCurrentPlayer model))
 
 
 playerToPiecesAndColor : Player -> List ( Piece, String )
@@ -397,8 +406,8 @@ playerToPiecesAndColor player =
     List.map (\piece -> ( piece, player.pColor )) player.pieces
 
 
-svgFromPieceAndColor : Piece -> String -> Bool -> Player -> Svg Msg
-svgFromPieceAndColor piece color piecesCanMove currentPlayer =
+svgFromPieceAndColor : Piece -> String -> Model -> Player -> Svg Msg
+svgFromPieceAndColor piece color model currentPlayer =
     let
         position =
             piece.position
@@ -411,7 +420,7 @@ svgFromPieceAndColor piece color piecesCanMove currentPlayer =
             , fill color
             ]
     in
-        if piece.active && piecesCanMove && (currentPlayer.pColor == color) then
+        if piece.active && model.playerNeedsToMakeMove && (currentPlayer.pColor == color) && pieceCanBeMoved (piece.relativePosition + model.dice) currentPlayer.pieces then
             use (baseAttributes ++ [ onClick (MovePiece piece), Svg.Attributes.style "cursor: pointer;" ]) []
         else
             use baseAttributes []
